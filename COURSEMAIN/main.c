@@ -6,6 +6,6 @@ int main() {
 
 
     printf ("Enterpoint\n");
-    ///
+    //
     return 0;
 }
