@@ -3,5 +3,5 @@ project(COURSEMAIN)
 
 set(CMAKE_C_STANDARD 11)
 
-set(SOURCE_FILES main.c)
+set(SOURCE_FILES COURSEMAIN/main.c)
 add_executable(COURSEMAIN ${SOURCE_FILES})

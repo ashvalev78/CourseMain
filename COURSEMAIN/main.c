@@ -2,6 +2,6 @@
 
 int main() {
     printf("Hello, World!\n");
-    printf("Artem Daun\n");
+    printf("Artem Commit\n");
     return 0;
 }
