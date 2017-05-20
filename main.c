@@ -78,7 +78,7 @@ BOOK *BooksListFromString(char **str, int anum) {
 }
 
 AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
-    AUTHOR *head = NULL, *tmp = head;
+    AUTHOR *head = NULL, *tmp;
     int p;
     for (int i = 0; i < num; i++) {
         tmp = (AUTHOR*)malloc(sizeof(AUTHOR));
@@ -88,7 +88,9 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
         for (int j = 0; str[i][j] != '\0'; j++) {
             if (str[i][j] == '(') { // I decided that name will be written in the rounded scopes
                 for (int k = 0; str[i][j] != ')'; k++, j++) {
+                    printf("OK\n");
                     tmp->name = (char*)realloc(tmp->name, (k + 2) * sizeof(char));
+                    printf("OK\n");
                     tmp->name[k] = str[i][j];
                     tmp->name[k + 1] = '\0';
                 }
@@ -173,7 +175,7 @@ BOOK *getbooks(int *num) {
     return head;
 }
 
-
+/*
 AUTHOR *getauth() {
     AUTHOR *Ahead = (AUTHOR*)malloc(sizeof(AUTHOR));
     Ahead->next = NULL;
@@ -201,7 +203,7 @@ AUTHOR *getauthlist () {
     }
     return Ahead;
 }
-
+*/
 void Afree(AUTHOR *head) {
     if (head != NULL) {
         while (head->next != NULL) {
@@ -214,6 +216,17 @@ void Afree(AUTHOR *head) {
 
 int main()
 {
+    char **Astr = (char**)malloc(3*sizeof(char*)), **Bstr = (char**)malloc(2*sizeof(char*));
+    for (int i = 0; i < 3; i++) {
+        Astr[i] = (char*)malloc(1000*sizeof(char));
+        Astr[i] = "(Name)[Surname] 1901 1999 23\n";
+    }
+    for (int k = 0; k < 2; k++) {
+        Bstr[k] = (char*)malloc(1000*sizeof(char));
+        Bstr[k] = "(Shit) 1488\n";
+    }
+    AUTHOR *Ahead = AuthListFromString(Astr, 3, Bstr);
     printf("hi\n");
+    char ch = getch();
     return 0;
 }
