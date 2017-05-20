@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <conio.h>
+#include <math.h>
 
 typedef struct BOOK {
     char *name;
@@ -49,6 +50,7 @@ AUTHOR *fgetbase() {
 
 AUTHOR *AuthListFromString(char **str, int num) {
     AUTHOR *head = NULL, *tmp = head;
+    int p;
     for (int i = 0; i < num; i++) {
         tmp = (AUTHOR*)malloc(sizeof(AUTHOR));
         tmp->prev = head;
@@ -69,15 +71,36 @@ AUTHOR *AuthListFromString(char **str, int num) {
                     tmp->surname[k + 1] = '\0';
                 }
             }
-            if (str[i][j] == ' ') {
-                tmp->birth = ('0' - str[i][j])*1000;
+            if (str[i][j] == ' ') { // All this func must be replaced by 1 func getnum(int *field);
+                p = 3;
+                tmp->birth = ('0' - str[i][j])*((int)pow(10,p));
                 j++;
-                for (int k = 2; str[i][j] != ' '; k--) {
-                    tmp->birth = tmp->birth + ('0' - str[i][j]);
+                for (p = 3; str[i][j] != ' '; --p, j++) {
+                    tmp->birth = tmp->birth + ('0' - str[i][j])*((int)pow(10,p));
                 }
+                tmp->birth = tmp->birth/((int)pow(10,p));
+            }
+            if (str[i][j] == ' ') {
+                p = 3;
+                tmp->death = ('0' - str[i][j])*((int)pow(10,p));
+                j++;
+                for (p = 3; str[i][j] != ' '; --p, j++) {
+                    tmp->death = tmp->death + ('0' - str[i][j])*((int)pow(10,p));
+                }
+                tmp->death = tmp->death/((int)pow(10,p));
+            }
+            if (str[i][j] == ' ') {
+                p = 3;
+                tmp->numbook = ('0' - str[i][j])*((int)pow(10,p));
+                j++;
+                for (p = 3; str[i][j] != ' '; --p, j++) {
+                    tmp->numbook = tmp->numbook + ('0' - str[i][j])*((int)pow(10,p));
+                }
+                tmp->numbook = tmp->numbook/((int)pow(10,p));
             }
         }
     }
+    return head;
 }
 
 AUTHOR *getauth() {
