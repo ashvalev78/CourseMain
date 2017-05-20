@@ -4,4 +4,4 @@ project(COURSEMAIN)
 set(CMAKE_C_STANDARD 11)
 
 set(SOURCE_FILES main.c)
-add_executable(COURSEMAIN ${SOURCE_FILES})
+add_executable(CourseMain ${SOURCE_FILES})

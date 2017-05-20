@@ -1,14 +1,13 @@
 #include <stdio.h>
 #include <malloc.h>
-#include <cstdlib>
 #include <conio.h>
 
 typedef struct BOOK {
     char *name;
     int year;
-    BOOK *next;
-    BOOK *prev;
-};
+    struct BOOK *next;
+    struct BOOK *prev;
+} BOOK;
 
 typedef struct AUTHOR {
     char *name;
@@ -17,9 +16,9 @@ typedef struct AUTHOR {
     int death;
     int numbook;
     BOOK *books;
-    AUTHOR *next;
-    AUTHOR *prev;
-};
+    struct AUTHOR *next;
+    struct AUTHOR *prev;
+} AUTHOR;
 
 char *getstr() {
     int i = -1;
@@ -112,6 +111,5 @@ void Afree(AUTHOR *head) {
 int main()
 {
 
-    system("pause");
     return 0;
 }
