@@ -99,6 +99,8 @@ AUTHOR *AuthListFromString(char **str, int num) {
                 tmp->numbook = tmp->numbook/((int)pow(10,p));
             }
         }
+        head = tmp;
+        tmp = tmp->next;
     }
     return head;
 }
