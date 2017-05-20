@@ -55,6 +55,7 @@ BOOK *BooksListFromString(char **str, int anum) {
         tmp = (BOOK*)malloc(sizeof(BOOK));
         tmp->next = NULL;
         tmp->prev = head;
+        tmp->name = NULL;
         if (str[anum][j] == '(') {
             for (int k = 0; str[anum][j] != ')'; j++, k++) {
                 tmp->name = (char*)realloc(tmp->name, (k + 2) * sizeof(char));
@@ -95,7 +96,6 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
                     tmp->name[k + 1] = '\0';
                 }
             }
-            printf("OK\n");
             if (str[i][j] == '[') { // Surname will be written in the square scopes
                 for (int k = 0; str[i][j] != ']'; k++, j++) {
                     tmp->surname = (char *) realloc(tmp->surname, (k + 2) * sizeof(char));
@@ -103,38 +103,39 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
                     tmp->surname[k + 1] = '\0';
                 }
             }
-            printf("OK\n");
+            printf("OK1\n");
             if (str[i][j] == ' ') { // All this func must be replaced by 1 func getnum(int *field);
                 p = 3;
-                tmp->birth = ('0' - str[i][j])*((int)pow(10,p));
+                printf("OK3\n");
+                tmp->birth = (str[i][j] - '0')*((int)pow(10,p));
+                printf("%c %d\n", str[i][j], tmp->birth);
                 j++;
                 for (p = 3; str[i][j] != ' '; --p, j++) {
-                    tmp->birth = tmp->birth + ('0' - str[i][j])*((int)pow(10,p));
+                    tmp->birth = tmp->birth + (str[i][j] - '0')*((int)pow(10,p));
                 }
                 tmp->birth = tmp->birth/((int)pow(10,p));
             }
             if (str[i][j] == ' ') {
                 p = 3;
-                tmp->death = ('0' - str[i][j])*((int)pow(10,p));
+                tmp->death = (str[i][j] - '0')*((int)pow(10,p));
                 j++;
                 for (p = 3; str[i][j] != ' '; --p, j++) {
-                    tmp->death = tmp->death + ('0' - str[i][j])*((int)pow(10,p));
+                    tmp->death = tmp->death + (str[i][j] - '0')*((int)pow(10,p));
                 }
                 tmp->death = tmp->death/((int)pow(10,p));
             }
             if (str[i][j] == ' ') {
                 p = 3;
-                tmp->numbook = ('0' - str[i][j]) * ((int) pow(10, p));
+                tmp->numbook = (0 - str[i][j]) * ((int) pow(10, p));
                 j++;
                 for (p = 3; str[i][j] != ' '; --p, j++) {
-                    tmp->numbook = tmp->numbook + ('0' - str[i][j]) * ((int) pow(10, p));
+                    tmp->numbook = tmp->numbook + (str[i][j] - '0') * ((int) pow(10, p));
                 }
                 tmp->numbook = tmp->numbook / ((int) pow(10, p));
             }
         }
-        printf("OK\n");
+        printf("OK2\n");
         tmp->books = BooksListFromString(BookMass, i);
-        printf("OK\n");
         head = tmp;
         tmp = tmp->next;
     }
