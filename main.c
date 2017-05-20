@@ -85,16 +85,17 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
         tmp->prev = head;
         tmp->next = NULL;
         tmp->books = NULL;
+        tmp->name = NULL;
+        tmp->surname = NULL;
         for (int j = 0; str[i][j] != '\0'; j++) {
             if (str[i][j] == '(') { // I decided that name will be written in the rounded scopes
                 for (int k = 0; str[i][j] != ')'; k++, j++) {
-                    printf("OK\n");
                     tmp->name = (char*)realloc(tmp->name, (k + 2) * sizeof(char));
-                    printf("OK\n");
                     tmp->name[k] = str[i][j];
                     tmp->name[k + 1] = '\0';
                 }
             }
+            printf("OK\n");
             if (str[i][j] == '[') { // Surname will be written in the square scopes
                 for (int k = 0; str[i][j] != ']'; k++, j++) {
                     tmp->surname = (char *) realloc(tmp->surname, (k + 2) * sizeof(char));
@@ -102,6 +103,7 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
                     tmp->surname[k + 1] = '\0';
                 }
             }
+            printf("OK\n");
             if (str[i][j] == ' ') { // All this func must be replaced by 1 func getnum(int *field);
                 p = 3;
                 tmp->birth = ('0' - str[i][j])*((int)pow(10,p));
@@ -130,7 +132,9 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
                 tmp->numbook = tmp->numbook / ((int) pow(10, p));
             }
         }
+        printf("OK\n");
         tmp->books = BooksListFromString(BookMass, i);
+        printf("OK\n");
         head = tmp;
         tmp = tmp->next;
     }
