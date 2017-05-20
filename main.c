@@ -47,6 +47,39 @@ AUTHOR *fgetbase() {
     }
 }
 
+AUTHOR *AuthListFromString(char **str, int num) {
+    AUTHOR *head = NULL, *tmp = head;
+    for (int i = 0; i < num; i++) {
+        tmp = (AUTHOR*)malloc(sizeof(AUTHOR));
+        tmp->prev = head;
+        tmp->next = NULL;
+        tmp->books = NULL;
+        for (int j = 0; str[i][j] != '\0'; j++) {
+            if (str[i][j] == '(') { // I decided that name will be written in the rounded scopes
+                for (int k = 0; str[i][j] != ')'; k++, j++) {
+                    tmp->name = (char*)realloc(tmp->name, (k + 2) * sizeof(char));
+                    tmp->name[k] = str[i][j];
+                    tmp->name[k + 1] = '\0';
+                }
+            }
+            if (str[i][j] == '[') { // Surname will be written in the square scopes
+                for (int k = 0; str[i][j] != ']'; k++, j++) {
+                    tmp->surname = (char *) realloc(tmp->surname, (k + 2) * sizeof(char));
+                    tmp->surname[k] = str[i][j];
+                    tmp->surname[k + 1] = '\0';
+                }
+            }
+            if (str[i][j] == ' ') {
+                tmp->birth = ('0' - str[i][j])*1000;
+                j++;
+                for (int k = 2; str[i][j] != ' '; k--) {
+                    tmp->birth = tmp->birth + ('0' - str[i][j]);
+                }
+            }
+        }
+    }
+}
+
 AUTHOR *getauth() {
     AUTHOR *Ahead = (AUTHOR*)malloc(sizeof(AUTHOR));
     Ahead->next = NULL;
@@ -61,7 +94,7 @@ AUTHOR *getauth() {
 }
 
 BOOK *getbooks(int *num) {
-    BOOK *Bhead, *tmp;
+    /*BOOK *Bhead, *tmp;
     tmp = Bhead = (BOOK*)malloc(sizeof(BOOK));
     printf("Enter the name of the book\n ");
     Bhead->name = getstr();
@@ -81,6 +114,21 @@ BOOK *getbooks(int *num) {
     }
     tmp->next = NULL;
     return Bhead;
+     */
+    BOOK *head = NULL, *tmp = head;
+    for (char ch = NULL; (ch = getch()) != '`';) {
+        tmp = (BOOK*)malloc(sizeof(BOOK));
+        tmp->next = NULL;
+        tmp->prev = head;
+        printf("Enter the name of the book\n");
+        tmp->name = getstr();
+        printf("Enter the date of edition\n");
+        scanf("%d", &tmp->year);
+        *num++;
+        head = tmp;
+        tmp = tmp->next;
+    }
+    return head;
 }
 
 AUTHOR *getauthlist () {
@@ -88,7 +136,7 @@ AUTHOR *getauthlist () {
     tmp = Ahead = getauth();
     Ahead->prev = NULL;
     Ahead->books = getbooks(&Ahead->numbook);
-    for (char ch = '0'; (ch = getch()) != '\e';) {
+    for (char ch = '0'; (ch = getch()) != '\b';) {
         tmp->next = (AUTHOR*)malloc(sizeof(AUTHOR));
         (tmp->next)->prev = tmp;
         tmp = tmp->next;
@@ -110,6 +158,6 @@ void Afree(AUTHOR *head) {
 
 int main()
 {
-
+    printf("hi\n");
     return 0;
 }
