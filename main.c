@@ -31,7 +31,7 @@ char *getstr() {
     string[i] = '\0';
     return string;
 }
-
+/*
 AUTHOR *fgetbase() {
     FILE *base;
     AUTHOR *Ahead, *tmp;
@@ -46,7 +46,7 @@ AUTHOR *fgetbase() {
             tmp = tmp->next;
         } while (fscanf(base, "%s%s%d%d%d", Ahead->name, Ahead->surname, &Ahead->birth, &Ahead->death, &Ahead->numbook) != EOF);
     }
-}
+}*/
 
 AUTHOR *AuthListFromString(char **str, int num) {
     AUTHOR *head = NULL, *tmp = head;
@@ -105,19 +105,6 @@ AUTHOR *AuthListFromString(char **str, int num) {
     return head;
 }
 
-AUTHOR *getauth() {
-    AUTHOR *Ahead = (AUTHOR*)malloc(sizeof(AUTHOR));
-    Ahead->next = NULL;
-    Ahead->numbook = 0;
-    printf("Enter the author's name\n");
-    Ahead->name = getstr();
-    printf("Enter the author's surname\n");
-    Ahead->surname = getstr();
-    printf("Enter the author's birth and death years\n");
-    scanf("%d, %d", &Ahead->birth, &Ahead->death);
-    return Ahead;
-}
-
 BOOK *getbooks(int *num) {
     /*BOOK *Bhead, *tmp;
     tmp = Bhead = (BOOK*)malloc(sizeof(BOOK));
@@ -154,6 +141,19 @@ BOOK *getbooks(int *num) {
         tmp = tmp->next;
     }
     return head;
+}
+
+AUTHOR *getauth() {
+    AUTHOR *Ahead = (AUTHOR*)malloc(sizeof(AUTHOR));
+    Ahead->next = NULL;
+    Ahead->numbook = 0;
+    printf("Enter the author's name\n");
+    Ahead->name = getstr();
+    printf("Enter the author's surname\n");
+    Ahead->surname = getstr();
+    printf("Enter the author's birth and death years\n");
+    scanf("%d, %d", &Ahead->birth, &Ahead->death);
+    return Ahead;
 }
 
 AUTHOR *getauthlist () {
