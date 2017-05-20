@@ -48,7 +48,36 @@ AUTHOR *fgetbase() {
     }
 }*/
 
-AUTHOR *AuthListFromString(char **str, int num) {
+BOOK *BooksListFromString(char **str, int anum) {
+    BOOK *head = NULL, *tmp = head;
+    int p;
+    for (int j = 0; str[anum][j] != '\0'; j++) {
+        tmp = (BOOK*)malloc(sizeof(BOOK));
+        tmp->next = NULL;
+        tmp->prev = head;
+        if (str[anum][j] == '(') {
+            for (int k = 0; str[anum][j] != ')'; j++, k++) {
+                tmp->name = (char*)realloc(tmp->name, (k + 2) * sizeof(char));
+                tmp->name[k] = str[anum][j];
+                tmp->name[k + 1] = '\0';
+            }
+        }
+        if (str[anum][j] == ' ') {
+            p = 3;
+            tmp->year = ('0' - str[anum][j])*((int)pow(10,p));
+            j++;
+            for (p = 3; str[anum][j] != ' '; --p, j++) {
+                tmp->year = tmp->year + ('0' - str[anum][j])*((int)pow(10,p));
+            }
+            tmp->year = tmp->year/((int)pow(10,p));
+        }
+        head = tmp;
+        tmp = tmp->next;
+    }
+    return head;
+}
+
+AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
     AUTHOR *head = NULL, *tmp = head;
     int p;
     for (int i = 0; i < num; i++) {
@@ -91,14 +120,15 @@ AUTHOR *AuthListFromString(char **str, int num) {
             }
             if (str[i][j] == ' ') {
                 p = 3;
-                tmp->numbook = ('0' - str[i][j])*((int)pow(10,p));
+                tmp->numbook = ('0' - str[i][j]) * ((int) pow(10, p));
                 j++;
                 for (p = 3; str[i][j] != ' '; --p, j++) {
-                    tmp->numbook = tmp->numbook + ('0' - str[i][j])*((int)pow(10,p));
+                    tmp->numbook = tmp->numbook + ('0' - str[i][j]) * ((int) pow(10, p));
                 }
-                tmp->numbook = tmp->numbook/((int)pow(10,p));
+                tmp->numbook = tmp->numbook / ((int) pow(10, p));
             }
         }
+        tmp->books = BooksListFromString(BookMass, i);
         head = tmp;
         tmp = tmp->next;
     }
@@ -142,6 +172,7 @@ BOOK *getbooks(int *num) {
     }
     return head;
 }
+
 
 AUTHOR *getauth() {
     AUTHOR *Ahead = (AUTHOR*)malloc(sizeof(AUTHOR));
