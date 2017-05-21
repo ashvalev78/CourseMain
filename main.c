@@ -32,22 +32,20 @@ char *getstr() {
     return string;
 }
 
-/*
+
 AUTHOR *fgetbase() {
     FILE *base;
-    AUTHOR *Ahead, *tmp;
-    BOOK *btmp = (BOOK*)malloc(sizeof(BOOK));
     printf("Enter the way to the author file\n ");
     if ((base = fopen(getstr(), "r")) != NULL) {
-        tmp = Ahead = (AUTHOR*)malloc(sizeof(AUTHOR));
-        fscanf(base, "%s%s%d%d%d", Ahead->name, Ahead->surname, &Ahead->birth, &Ahead->death, &Ahead->numbook);
-        do {
-            tmp->next = (AUTHOR*)malloc(sizeof(AUTHOR));
-            (tmp->next)->prev = tmp;
-            tmp = tmp->next;
-        } while (fscanf(base, "%s%s%d%d%d", Ahead->name, Ahead->surname, &Ahead->birth, &Ahead->death, &Ahead->numbook) != EOF);
+        int i = 0, j = 0;
+        char **Amass = (char**)malloc(sizeof(char*));
+        Amass[i] = (char*)malloc(sizeof(char));
+        while ((Amass[i][j] = fgetc(base)) != EOF) {
+            j = 0;
+            if ()
+        }
     }
-}*///
+}
 
 BOOK *BooksListFromString(char **str, int num) { // Функция для создания списка книг из полученного списка строк. Функция для последующей работы с файлами.
     BOOK *head = NULL, *tmp = head;
