@@ -49,11 +49,11 @@ AUTHOR *fgetbase() {
     }
 }*///
 
-BOOK *BooksListFromString(char **str) {
+BOOK *BooksListFromString(char **str, int num) {
     BOOK *head = NULL, *tmp = head;
     static int strnum = 0;
     int p;
-    for (int j = 0; str[strnum][j] != '*'; j++) {
+    for (int j = 0; str[strnum][j] != '*' && strnum < num && str[strnum][j] != '\0'; strnum++) {
         tmp = (BOOK*)malloc(sizeof(BOOK));
         tmp->next = NULL;
         tmp->prev = head;
@@ -63,15 +63,18 @@ BOOK *BooksListFromString(char **str) {
             tmp->name[k] = str[strnum][j];
             tmp->name[k + 1] = '\0';
         }
+        printf("%s\n", tmp->name);
         if (str[strnum][j] == ' ') {
-            p = 3;
-            tmp->year = (str[strnum][j] - '0')*((int)pow(10,p));
             j++;
-            for (p = 3; str[strnum][j] != '\0'; --p, j++) {
-                tmp->year += (str[strnum][j] - '0')*((int)pow(10,p));
+            p = 3;
+            tmp->year = (str[strnum][j] - '0')*((int)pow(10, p));
+            j++;
+            for (p = 2; str[strnum][j] != '\0'; p--, j++) {
+                tmp->year += (str[strnum][j] - '0')*((int)pow(10, p));
             }
-            tmp->year = tmp->year/((int)pow(10,p));
+            tmp->year = tmp->year / ((int)pow(10, p + 1));
         }
+        printf("%d\n", tmp->year);
         head = tmp;
         tmp = tmp->next;
     }
@@ -107,7 +110,7 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
             if (str[i][j] == ' ') { // All this func must be replaced by 1 func getnum(int *field);
                 j++;
                 p = 3;
-                tmp->birth = (str[i][j] - '0') * (int)pow(10,p);
+                tmp->birth = (str[i][j] - '0') * (int)pow(10, p);
                 j++;
                 for (p = 2; str[i][j] != ' '; p--, j++) {
                     tmp->birth = tmp->birth + (str[i][j] - '0') * (int)pow(10,p);
@@ -119,7 +122,7 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
             if (str[i][j] == ' ') {
                 j++;
                 p = 3;
-                tmp->death = (str[i][j] - '0') * (int)pow(10,p);
+                tmp->death = (str[i][j] - '0') * (int)pow(10, p);
                 j++;
                 for (p = 2; str[i][j] != ' '; p--, j++) {
                     tmp->death = tmp->death + (str[i][j] - '0') * (int)pow(10,p);
@@ -141,7 +144,7 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
             }
             printf("%d\n", tmp->numbook);
         }
-        tmp->books = BooksListFromString(BookMass);
+        tmp->books = BooksListFromString(BookMass, 2);
         head = tmp;
         tmp = tmp->next;
     }
