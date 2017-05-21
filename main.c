@@ -36,26 +36,26 @@ char *getstr() {
 char **FGetABase(int *num) {
     FILE *base;
     char **Amass = NULL;
+    int j = 0;
     printf("Enter the way to the author file\n");
     if ((base = fopen("F:/CourseMain/CourseMain/Authors.txt", "r")) != NULL) {
-        int i = 0, j = 0;
         Amass = (char**)malloc(sizeof(char*));
-        Amass[i] = (char*)malloc(sizeof(char));
-        while ((Amass[i][j] = fgetc(base)) != EOF) {
-            Amass[i] = (char*)realloc(Amass[i], (j + 1) * sizeof(char));
+        Amass[*num] = (char*)malloc(sizeof(char));
+        while ((Amass[*num][j] = (char)fgetc(base)) != EOF) {
+            Amass[*num] = (char*)realloc(Amass[*num], (j + 1) * sizeof(char));
             j++;
-            if (Amass[i][j] == '\n') {
-                Amass[i][j] = '\0';
-                printf("%s", Amass[i]);
-                i++;
-                Amass = (char**)realloc(Amass, (i + 1) * sizeof(char*));
-                Amass[i] = (char*)malloc(sizeof(char));
+            if (Amass[*num][j - 1] == '\n') {
+                Amass[*num][j - 1] = '\0';
+                (*num)++;
+                Amass = (char**)realloc(Amass, (*num + 1) * sizeof(char*));
+                Amass[*num] = (char*)malloc(sizeof(char));
                 j = 0;
             }
+            Amass[*num][j] = '\0';
         }
-        *num = i + 1;
     }
     printf("%s\n", Amass[0]);
+    printf("%s\n", Amass[1]);
     fclose(base);
     return Amass;
 }
@@ -63,11 +63,11 @@ char **FGetABase(int *num) {
 BOOK *BooksListFromString(char **str, int num) { // Функция для создания списка книг из полученного списка строк. Функция для последующей работы с файлами.
     BOOK *nhead = NULL, *head = NULL, *tmp = head;
     int strnum = 0;
-    int p;
-    for (int j = 0; strnum < num; strnum++) {
+    int p = NULL;
+    for (int j = 0; strnum < num && str[strnum][j] != '*'; strnum++) {
         j = 0;
         tmp = (BOOK*)malloc(sizeof(BOOK));
-        if (j = 0)
+        if (p == NULL)
             nhead = tmp;
         tmp->next = head;
         tmp->prev = NULL;
@@ -104,7 +104,7 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) { // Функц
     int p;
     for (int i = 0; i < num; i++) {
         tmp = (AUTHOR*)malloc(sizeof(AUTHOR));
-        if (i = 0)
+        if (i == 0)
             nhead = tmp;
         tmp->prev = NULL;
         tmp->next = head;
@@ -257,7 +257,7 @@ int main()
         Astr[i] = (char *) malloc(1000 * sizeof(char));
         Astr[i] = "Name Surname 1901 299 33\0";
     }
-    int num;
+    int num = 0;
     char **Auth = FGetABase(&num);
     printf("%d\n", num);
     for (int k = 0; k < 2; k++) {
