@@ -48,13 +48,13 @@ AUTHOR *fgetbase() {
     }
 }*/
 
-BOOK *BooksListFromString(char **str, int anum) {
-    BOOK *head = NULL, *tmp = head;
+BOOK *BooksListFromString(char **str, int anum) {   //зачем передавать номер строки и массив строк, когда можно                         
+    BOOK *head = NULL, *tmp = head;                 //просто передать одну строку из массива?
     int p;
     for (int j = 0; str[anum][j] != '\0'; j++) {
         tmp = (BOOK*)malloc(sizeof(BOOK));
         tmp->next = NULL;
-        tmp->prev = head;
+        tmp->prev = head;                           //зачем каждый раз передвигать head, если потом все равно "head = tmp;" ?
         tmp->name = NULL;
         if (str[anum][j] == '(') {
             for (int k = 0; str[anum][j] != ')'; j++, k++) {
