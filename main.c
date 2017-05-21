@@ -37,7 +37,8 @@ char **FGetABase(int *num) {
     FILE *base;
     char **Amass = NULL;
     printf("Enter the way to the author file\n ");
-    if ((base = fopen("Authors.txt", "r")) != NULL) {
+    //if ((base = fopen("F:\CourseMain\CourseMain\Authors.txt", "r")) != NULL) {
+    base = fopen("Authors.txt", "r");
         int i = 0, j = 0;
         printf("OK\n");
         Amass = (char**)malloc(sizeof(char*));
@@ -47,12 +48,14 @@ char **FGetABase(int *num) {
             if (Amass[i][j] == '\n') {
                 i++;
                 Amass = (char**)realloc(Amass, (i + 1) * sizeof(char*));
+                j = 0;
             }
-            j = 0;
+            j++;
         }
-        printf("%d\n", i);
+    printf("%s\n", Amass[0]);
+        //printf("%d\n", i);
         *num = i + 1;
-    }
+    //}
     fclose(base);
     return Amass;
 }
@@ -86,6 +89,8 @@ BOOK *BooksListFromString(char **str, int num) { // Функция для соз
         }
         printf("%d\n", tmp->year);
         head = tmp;
+        if (head->next != NULL)
+            head->next->prev = head;
         tmp = tmp->prev;
     }
     printf("OK!!!!!!!!!!!!!!!!!!!!!\n");
@@ -157,6 +162,8 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) { // Функц
         }
         tmp->books = BooksListFromString(BookMass, 2);
         head = tmp;
+        if (head->next != NULL)
+            head->next->prev = head;
         tmp = tmp->prev;
     }
     return head;
