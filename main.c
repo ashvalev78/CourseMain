@@ -49,16 +49,17 @@ AUTHOR *fgetbase() {
     }
 }*///
 
-BOOK *BooksListFromString(char **str, int num) {
+BOOK *BooksListFromString(char **str, int num) { // Функция для создания списка книг из полученного списка строк. Функция для последующей работы с файлами.
     BOOK *head = NULL, *tmp = head;
-    static int strnum = 0;
+    int strnum = 0;
     int p;
-    for (int j = 0; str[strnum][j] != '*' && strnum < num && str[strnum][j] != '\0'; strnum++) {
+    for (int j = 0; strnum < num; strnum++) {
+        j = 0;
         tmp = (BOOK*)malloc(sizeof(BOOK));
-        tmp->next = NULL;
-        tmp->prev = head;
+        tmp->next = head;
+        tmp->prev = NULL;
         tmp->name = NULL;
-        for (int k = 0; str[strnum][j] != ' '; j++, k++) {
+        for (int k = 0; str[strnum][j] != ' '; j++, k++) { // Здесь все функции построены по тому же принципу, что и в списке авторов.
             tmp->name = (char*)realloc(tmp->name, (k + 2) * sizeof(char));
             tmp->name[k] = str[strnum][j];
             tmp->name[k + 1] = '\0';
@@ -70,29 +71,31 @@ BOOK *BooksListFromString(char **str, int num) {
             tmp->year = (str[strnum][j] - '0')*((int)pow(10, p));
             j++;
             for (p = 2; str[strnum][j] != '\0'; p--, j++) {
-                tmp->year += (str[strnum][j] - '0')*((int)pow(10, p));
+                tmp->year += (str[strnum][j] - '0') * ((int)pow(10, p));
             }
+            if (p > 0)
             tmp->year = tmp->year / ((int)pow(10, p + 1));
         }
         printf("%d\n", tmp->year);
         head = tmp;
-        tmp = tmp->next;
+        tmp = tmp->prev;
     }
+    printf("OK!!!!!!!!!!!!!!!!!!!!!\n");
     return head;
 }
 
-AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
+AUTHOR *AuthListFromString(char **str, int num, char **BookMass) { // Функция создания списка авторов из полученного списка строк. Функция для работы с файлом.
     AUTHOR *head = NULL, *tmp;
     int p;
     for (int i = 0; i < num; i++) {
         tmp = (AUTHOR*)malloc(sizeof(AUTHOR));
-        tmp->prev = head;
-        tmp->next = NULL;
+        tmp->prev = NULL;
+        tmp->next = head;
         tmp->books = NULL;
         tmp->name = NULL;
         tmp->surname = NULL;
         for (int j = 0; str[i][j] != '\0'; j++) {
-            for (int k = 0; str[i][j] != ' '; k++, j++) {
+            for (int k = 0; str[i][j] != ' '; k++, j++) { // Функция получения имени автора, принцип понятен основан на простом считывании всех символов от начала стоки и до пробела.
                 tmp->name = (char*)realloc(tmp->name, (k + 2) * sizeof(char));
                 tmp->name[k] = str[i][j];
                 tmp->name[k + 1] = '\0';
@@ -100,14 +103,14 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
             printf("%s\n", tmp->name);
             if (str[i][j] == ' ') {
                 j++;
-                for (int k = 0; str[i][j] != ' '; k++, j++) {
+                for (int k = 0; str[i][j] != ' '; k++, j++) { // Функция получения фамилии автора, принцип действия понятен,я думаю.
                     tmp->surname = (char *) realloc(tmp->surname, (k + 2) * sizeof(char));
                     tmp->surname[k] = str[i][j];
                     tmp->surname[k + 1] = '\0';
                 }
             }
             printf("%s\n", tmp->surname);
-            if (str[i][j] == ' ') { // All this func must be replaced by 1 func getnum(int *field);
+            if (str[i][j] == ' ') { // Функции такого рода надо будет впоследствии заменить на функцию getnum(). Собирает число из считываемых символов. Чтобы собрать число использует умножение на 10^k
                 j++;
                 p = 3;
                 tmp->birth = (str[i][j] - '0') * (int)pow(10, p);
@@ -119,19 +122,19 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
                 tmp->birth = tmp->birth / (int)pow(10, p + 1);
             }
             printf("%d\n", tmp->birth);
-            if (str[i][j] == ' ') {
+            if (str[i][j] == ' ') { // Аналогично с функцией выше
                 j++;
                 p = 3;
                 tmp->death = (str[i][j] - '0') * (int)pow(10, p);
                 j++;
                 for (p = 2; str[i][j] != ' '; p--, j++) {
-                    tmp->death = tmp->death + (str[i][j] - '0') * (int)pow(10,p);
+                    tmp->death = tmp->death + (str[i][j] - '0') * (int)pow(10, p);
                 }
                 if (p > 0)
                 tmp->death = tmp->death / ((int)pow(10, p + 1));
             }
             printf("%d\n", tmp->death);
-            if (str[i][j] == ' ') {
+            if (str[i][j] == ' ') { // Аналогично с функцией выше
                 j++;
                 p = 3;
                 tmp->numbook = (str[i][j] - '0') * ((int) pow(10, p));
@@ -146,7 +149,7 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
         }
         tmp->books = BooksListFromString(BookMass, 2);
         head = tmp;
-        tmp = tmp->next;
+        tmp = tmp->prev;
     }
     return head;
 }
@@ -239,6 +242,7 @@ int main()
     for (int k = 0; k < 2; k++) {
         Bstr[k] = (char*)malloc(1000*sizeof(char));
         Bstr[k] = "Shit 1488\0";
+        printf("%s\n", Bstr[k]);
     }
     AUTHOR *Ahead = AuthListFromString(Astr, 3, Bstr);
     printf("hi\n");
