@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 
 typedef struct prospect {
@@ -78,7 +79,7 @@ void printCityList(city *head) {
 
         for (int i = 1; link != NULL; i++, link = link->next) {
 
-            printf("Node #%d Name - [%s]\nFoundDate - [%u]\nPopulation - [%f]\nNumberOfProspects - [%u]\n",
+            printf("Node #%d\nName - [%s]\nFoundDate - [%u]\nPopulation - [%f]\nNumberOfProspects - [%u]\n",
                    i++, link->name, link->foundation, link->population, link->prospNumber);
 
         }
@@ -104,7 +105,7 @@ void printCityListReverse(city *head) {
 
         do
         {
-            printf("Node #%d Name - [%s]\nFoundDate - [%u]\nPopulation - [%f]\nNumberOfProspects - [%u]\n",
+            printf("Node #%d\nName - [%s]\nFoundDate - [%u]\nPopulation - [%f]\nNumberOfProspects - [%u]\n",
                    i--, link->name, link->foundation, link->population, link->prospNumber);
             link = link -> prev;
         } while(link != NULL);
@@ -114,9 +115,110 @@ void printCityListReverse(city *head) {
     }
 }
 
+unsigned int getIntFromString(char *string, int *firstPosition) {
+
+
+    unsigned int N = 0;
+    int *j = firstPosition, elderPositionU;
+    for (elderPositionU = 0; string[++*j] != ' ' && string[*j] != '\0' && string[*j] != '.'; elderPositionU++);
+
+    int k;
+    for (k = elderPositionU; k > 1; k--) {
+        N += (int) pow(10, k - 1) * (string[*j - k] - '0');
+    }
+    N += (string[*j - k] - '0');
+
+    return N;
+
+}
+
+float getFloatFromString(char *string, int *firstPosition) {
+
+
+    float F1, F2, F;
+    F1 = F2 = F = .0;
+    F1 = getIntFromString(string, firstPosition);
+    printf("F1 = [%f]\n", F1);
+    printf("f= [%d]\n", *firstPosition );
+
+    int eldPos = *firstPosition;
+
+    printf("e= [%d]\n", eldPos );
+
+    F2 = getIntFromString(string, firstPosition);
+    printf("F2 = [%f]\n", F2);
+
+    printf("f-e = [%d]\n", *firstPosition - eldPos - 1);
+    F2 *= pow(10, -(*firstPosition - eldPos - 1));
+    printf("F2 = [%f]\n", F2);
+
+    F = F1 + F2;
+    int precision= (*firstPosition - eldPos - 1);
+    int *pr = &precision;
+    printf("F = [%f]\n", F);
+
+    return F;
+
+
+}
+
+city *createNode(char *string) {
+
+    city *link = NULL;
+    link = (city *) malloc(sizeof(city));
+    link->next = NULL;
+
+    if (string[0] != '\0') {
+
+        link->name = NULL;
+        int j = -1;
+        do {
+            j++;
+            link->name = (char *) realloc(link->name, (j + 1) * sizeof(char));
+        } while ((link->name[j] = string[j]) != ' ');
+        link -> name[j] = '\0';
+
+
+        printf("J1 = [%d]\n", j);
+        link -> foundation = getIntFromString(string, &j);
+        printf("J2 = [%d]\n", j);
+        link -> prospNumber = getIntFromString(string, &j);
+        printf("prp = [%d]\n", link -> prospNumber);
+        link -> population = getFloatFromString(string, &j);
+        printf("pop = [%f]\n", link -> population);
+
+
+
+
+    }
+
+
+    return link;
+}
+
+city *create(char **baseString, int numString) {
+
+    city *headCity = NULL, *link = NULL;
+
+
+
+    for (int i = 1; i < numString; i++) {
+
+        //link = createNode(link, baseString[i]);
+        link = link -> next;
+    }
+
+
+
+
+    return headCity;
+}
+
+/*
 city *create(int numNodes) {
 
     city *head = NULL, *link = NULL;
+
     head = link = (city *)malloc(sizeof(city));
 
     printf("Enter the name of the city: ");
@@ -159,7 +261,7 @@ city *create(int numNodes) {
     link -> next = NULL;
     return head;
 }
-
+*/
 /*
 char **getTextFromFile() {
 
@@ -184,7 +286,7 @@ int main() {
 
     int num = 3;
     city *head = NULL;
-    head = create(num);
+    head = createNode("Moscow 123 12 132.123450");
 
     printCityList(head);
     printCityListReverse(head);
