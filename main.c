@@ -45,6 +45,7 @@ char **FGetABase(int *num) {
         Amass[i] = (char*)malloc(sizeof(char));
         while ((Amass[i][j] = fgetc(base)) != EOF) {
             Amass[i] = (char*)realloc(Amass[i], (j + 1) * sizeof(char));
+            printf("%c", Amass[i][j]);
             if (Amass[i][j] == '\n') {
                 i++;
                 Amass = (char**)realloc(Amass, (i + 1) * sizeof(char*));
@@ -61,12 +62,14 @@ char **FGetABase(int *num) {
 }
 
 BOOK *BooksListFromString(char **str, int num) { // Функция для создания списка книг из полученного списка строк. Функция для последующей работы с файлами.
-    BOOK *head = NULL, *tmp = head;
+    BOOK *nhead = NULL, *head = NULL, *tmp = head;
     int strnum = 0;
     int p;
     for (int j = 0; strnum < num; strnum++) {
         j = 0;
         tmp = (BOOK*)malloc(sizeof(BOOK));
+        if (j = 0)
+            nhead = tmp;
         tmp->next = head;
         tmp->prev = NULL;
         tmp->name = NULL;
@@ -94,14 +97,16 @@ BOOK *BooksListFromString(char **str, int num) { // Функция для соз
         tmp = tmp->prev;
     }
     printf("OK!!!!!!!!!!!!!!!!!!!!!\n");
-    return head;
+    return nhead;
 }
 
 AUTHOR *AuthListFromString(char **str, int num, char **BookMass) { // Функция создания списка авторов из полученного списка строк. Функция для работы с файлом.
-    AUTHOR *head = NULL, *tmp;
+    AUTHOR *nhead = NULL, *head = NULL, *tmp;
     int p;
     for (int i = 0; i < num; i++) {
         tmp = (AUTHOR*)malloc(sizeof(AUTHOR));
+        if (i = 0)
+            nhead = tmp;
         tmp->prev = NULL;
         tmp->next = head;
         tmp->books = NULL;
@@ -166,7 +171,7 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) { // Функц
             head->next->prev = head;
         tmp = tmp->prev;
     }
-    return head;
+    return nhead;
 }
 
 BOOK *getbooks(int *num) {
