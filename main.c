@@ -47,7 +47,7 @@ AUTHOR *fgetbase() {
             tmp = tmp->next;
         } while (fscanf(base, "%s%s%d%d%d", Ahead->name, Ahead->surname, &Ahead->birth, &Ahead->death, &Ahead->numbook) != EOF);
     }
-}*/
+}*///
 
 BOOK *BooksListFromString(char **str) {
     BOOK *head = NULL, *tmp = head;
