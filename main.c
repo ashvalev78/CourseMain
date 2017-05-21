@@ -31,6 +31,7 @@ char *getstr() {
     string[i] = '\0';
     return string;
 }
+
 /*
 AUTHOR *fgetbase() {
     FILE *base;
@@ -48,27 +49,26 @@ AUTHOR *fgetbase() {
     }
 }*/
 
-BOOK *BooksListFromString(char **str, int anum) {
+BOOK *BooksListFromString(char **str) {
     BOOK *head = NULL, *tmp = head;
+    static int strnum = 0;
     int p;
-    for (int j = 0; str[anum][j] != '\0'; j++) {
+    for (int j = 0; str[strnum][j] != '*'; j++) {
         tmp = (BOOK*)malloc(sizeof(BOOK));
         tmp->next = NULL;
         tmp->prev = head;
         tmp->name = NULL;
-        if (str[anum][j] == '(') {
-            for (int k = 0; str[anum][j] != ')'; j++, k++) {
-                tmp->name = (char*)realloc(tmp->name, (k + 2) * sizeof(char));
-                tmp->name[k] = str[anum][j];
-                tmp->name[k + 1] = '\0';
-            }
+        for (int k = 0; str[strnum][j] != ' '; j++, k++) {
+            tmp->name = (char*)realloc(tmp->name, (k + 2) * sizeof(char));
+            tmp->name[k] = str[strnum][j];
+            tmp->name[k + 1] = '\0';
         }
-        if (str[anum][j] == ' ') {
+        if (str[strnum][j] == ' ') {
             p = 3;
-            tmp->year = ('0' - str[anum][j])*((int)pow(10,p));
+            tmp->year = (str[strnum][j] - '0')*((int)pow(10,p));
             j++;
-            for (p = 3; str[anum][j] != ' '; --p, j++) {
-                tmp->year = tmp->year + ('0' - str[anum][j])*((int)pow(10,p));
+            for (p = 3; str[strnum][j] != '\0'; --p, j++) {
+                tmp->year += (str[strnum][j] - '0')*((int)pow(10,p));
             }
             tmp->year = tmp->year/((int)pow(10,p));
         }
@@ -89,53 +89,59 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass) {
         tmp->name = NULL;
         tmp->surname = NULL;
         for (int j = 0; str[i][j] != '\0'; j++) {
-            if (str[i][j] == '(') { // I decided that name will be written in the rounded scopes
-                for (int k = 0; str[i][j] != ')'; k++, j++) {
-                    tmp->name = (char*)realloc(tmp->name, (k + 2) * sizeof(char));
-                    tmp->name[k] = str[i][j];
-                    tmp->name[k + 1] = '\0';
-                }
+            for (int k = 0; str[i][j] != ' '; k++, j++) {
+                tmp->name = (char*)realloc(tmp->name, (k + 2) * sizeof(char));
+                tmp->name[k] = str[i][j];
+                tmp->name[k + 1] = '\0';
             }
-            if (str[i][j] == '[') { // Surname will be written in the square scopes
-                for (int k = 0; str[i][j] != ']'; k++, j++) {
+            printf("%s\n", tmp->name);
+            if (str[i][j] == ' ') {
+                j++;
+                for (int k = 0; str[i][j] != ' '; k++, j++) {
                     tmp->surname = (char *) realloc(tmp->surname, (k + 2) * sizeof(char));
                     tmp->surname[k] = str[i][j];
                     tmp->surname[k + 1] = '\0';
                 }
             }
-            printf("OK1\n");
+            printf("%s\n", tmp->surname);
             if (str[i][j] == ' ') { // All this func must be replaced by 1 func getnum(int *field);
-                p = 3;
-                printf("OK3\n");
-                tmp->birth = (str[i][j] - '0')*((int)pow(10,p));
-                printf("%c %d\n", str[i][j], tmp->birth);
                 j++;
-                for (p = 3; str[i][j] != ' '; --p, j++) {
-                    tmp->birth = tmp->birth + (str[i][j] - '0')*((int)pow(10,p));
+                p = 3;
+                tmp->birth = (str[i][j] - '0') * (int)pow(10,p);
+                j++;
+                for (p = 2; str[i][j] != ' '; p--, j++) {
+                    tmp->birth = tmp->birth + (str[i][j] - '0') * (int)pow(10,p);
                 }
-                tmp->birth = tmp->birth/((int)pow(10,p));
+                if (p > 0)
+                tmp->birth = tmp->birth / (int)pow(10, p + 1);
             }
+            printf("%d\n", tmp->birth);
             if (str[i][j] == ' ') {
-                p = 3;
-                tmp->death = (str[i][j] - '0')*((int)pow(10,p));
                 j++;
-                for (p = 3; str[i][j] != ' '; --p, j++) {
-                    tmp->death = tmp->death + (str[i][j] - '0')*((int)pow(10,p));
+                p = 3;
+                tmp->death = (str[i][j] - '0') * (int)pow(10,p);
+                j++;
+                for (p = 2; str[i][j] != ' '; p--, j++) {
+                    tmp->death = tmp->death + (str[i][j] - '0') * (int)pow(10,p);
                 }
-                tmp->death = tmp->death/((int)pow(10,p));
+                if (p > 0)
+                tmp->death = tmp->death / ((int)pow(10, p + 1));
             }
+            printf("%d\n", tmp->death);
             if (str[i][j] == ' ') {
-                p = 3;
-                tmp->numbook = (0 - str[i][j]) * ((int) pow(10, p));
                 j++;
-                for (p = 3; str[i][j] != ' '; --p, j++) {
-                    tmp->numbook = tmp->numbook + (str[i][j] - '0') * ((int) pow(10, p));
+                p = 3;
+                tmp->numbook = (str[i][j] - '0') * ((int) pow(10, p));
+                j++;
+                for (p = 2; str[i][j] != '\0'; p--, j++) {
+                    tmp->numbook = tmp->numbook + (str[i][j] - '0') * (int)pow(10, p);
                 }
-                tmp->numbook = tmp->numbook / ((int) pow(10, p));
+                if (p > 0)
+                tmp->numbook = tmp->numbook / ((int) pow(10, p + 1));
             }
+            printf("%d\n", tmp->numbook);
         }
-        printf("OK2\n");
-        tmp->books = BooksListFromString(BookMass, i);
+        tmp->books = BooksListFromString(BookMass);
         head = tmp;
         tmp = tmp->next;
     }
@@ -223,12 +229,13 @@ int main()
 {
     char **Astr = (char**)malloc(3*sizeof(char*)), **Bstr = (char**)malloc(2*sizeof(char*));
     for (int i = 0; i < 3; i++) {
-        Astr[i] = (char*)malloc(1000*sizeof(char));
-        Astr[i] = "(Name)[Surname] 1901 1999 23\n";
+        Astr[i] = (char *) malloc(1000 * sizeof(char));
+        Astr[i] = "Name Surname 1901 2999 33\0";
+        printf("%s\n", Astr[i]);
     }
     for (int k = 0; k < 2; k++) {
         Bstr[k] = (char*)malloc(1000*sizeof(char));
-        Bstr[k] = "(Shit) 1488\n";
+        Bstr[k] = "Shit 1488\0";
     }
     AUTHOR *Ahead = AuthListFromString(Astr, 3, Bstr);
     printf("hi\n");
