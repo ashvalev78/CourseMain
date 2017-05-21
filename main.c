@@ -36,27 +36,26 @@ char *getstr() {
 char **FGetABase(int *num) {
     FILE *base;
     char **Amass = NULL;
-    printf("Enter the way to the author file\n ");
-    //if ((base = fopen("F:\CourseMain\CourseMain\Authors.txt", "r")) != NULL) {
-    base = fopen("Authors.txt", "r");
+    printf("Enter the way to the author file\n");
+    if ((base = fopen("F:/CourseMain/CourseMain/Authors.txt", "r")) != NULL) {
         int i = 0, j = 0;
-        printf("OK\n");
         Amass = (char**)malloc(sizeof(char*));
         Amass[i] = (char*)malloc(sizeof(char));
         while ((Amass[i][j] = fgetc(base)) != EOF) {
             Amass[i] = (char*)realloc(Amass[i], (j + 1) * sizeof(char));
-            printf("%c", Amass[i][j]);
+            j++;
             if (Amass[i][j] == '\n') {
+                Amass[i][j] = '\0';
+                printf("%s", Amass[i]);
                 i++;
                 Amass = (char**)realloc(Amass, (i + 1) * sizeof(char*));
+                Amass[i] = (char*)malloc(sizeof(char));
                 j = 0;
             }
-            j++;
         }
-    printf("%s\n", Amass[0]);
-        //printf("%d\n", i);
         *num = i + 1;
-    //}
+    }
+    printf("%s\n", Amass[0]);
     fclose(base);
     return Amass;
 }
@@ -257,7 +256,6 @@ int main()
     for (int i = 0; i < 3; i++) {
         Astr[i] = (char *) malloc(1000 * sizeof(char));
         Astr[i] = "Name Surname 1901 299 33\0";
-        printf("%s\n", Astr[i]);
     }
     int num;
     char **Auth = FGetABase(&num);
@@ -265,7 +263,6 @@ int main()
     for (int k = 0; k < 2; k++) {
         Bstr[k] = (char*)malloc(1000*sizeof(char));
         Bstr[k] = "Shit 1\0";
-        printf("%s\n", Bstr[k]);
     }
     AUTHOR *Ahead = AuthListFromString(Auth, num, Bstr);
     printf("hi\n");
