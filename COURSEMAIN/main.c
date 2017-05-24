@@ -70,10 +70,8 @@ char *getStr ()
 void printProspList(prospect *head) {
     if (head != NULL) {
         prospect *link = head;
-
         for (int i = 1; link != NULL; i++, link = link->next) {
             printf("Prosp: Node #%d\nName - [%s]\nNumber - [%d]\n", i, link->name, link->number);
-
         }
         puts("The end of the list\n");
     } else {
@@ -86,19 +84,14 @@ void printProspList(prospect *head) {
 	Функция выводит на экран содержимое информационного поля всех элементов списка.
  */
 void printCityList(city *head) {
-
     if (head != NULL) {
         city *link = head;
-
         for (int i = 1; link != NULL; i++, link = link->next) {
-
             printf("City: Node #%d\nName - [%s]\nFoundDate - [%u]\nPopulation - [%f]\nNumberOfProspects - [%u]\n", i,
                    link->name, link->foundation, link->population, link->prospNumber);
             printProspList(link -> prosp);
             printf("\n\n\n");
-
         }
-
         puts("The end of the list\n");
     } else {
         printf("Your list is empty\n");
@@ -116,8 +109,6 @@ void printCityListReverse(city *head) {
         city *link = head;
         int i;
         for (i = 1; link -> next != NULL; i++, link = link -> next);
-
-
         do
         {
             printf("Node #%d\nName - [%s]\nFoundDate - [%u]\nPopulation - [%f]\nNumberOfProspects - [%u]\n",
@@ -145,9 +136,11 @@ unsigned int getIntFromString(char *string, int *firstPosition) {
     return N;
 }
 
+//Флоат обязательно должен иметь вид 0.0
 float getFloatFromString(char *string, int *numPosition) {
-    float F1, F2, F;
-    F1 = F2 = F = .0;
+    float F2, F;
+    int F1 = 0;
+    F2 = F = .0;
     F1 = getIntFromString(string, numPosition);
 
     int eldPosition = *numPosition;
@@ -180,21 +173,25 @@ prospect *createProspNode(char *string) {
     return link;
 }
 
-prospect *createProsp(char **baseString, int numString) {
+prospect *createProsp(char **baseString, int numString, int *countProsp) {
     prospect *head = NULL, *link = NULL;
-    head = link = createProspNode(baseString[0]);
-    link -> prev = NULL;
-    for (int i = 1; i < numString; i++) {
-        link->next = createProspNode(baseString[i]);
-        link->next->prev = link;
-        link = link->next;
+    if (numString != 0) {
+        head = link = createProspNode(baseString[(*countProsp)++]);
+        link->prev = NULL;
+        for (int i = 1; i < numString; i++, (*countProsp)++) {
+            link->next = createProspNode(baseString[*countProsp]);
+            link->next->prev = link;
+            link = link->next;
+        }
+        link->next = NULL;
     }
-    link->next = NULL;
+    //тильда
+    (*countProsp)++;
     return head;
 }
 
 
-city *createCityNode(char *string, char **baseProspString, int numProspString) {
+city *createCityNode(char *string, char **baseProspString, int *countProsp) {
     city *link = NULL;
     if (string[0] != '\0') {
         link = (city *) malloc(sizeof(city));
@@ -203,33 +200,27 @@ city *createCityNode(char *string, char **baseProspString, int numProspString) {
         link -> foundation = getIntFromString(string, &j);
         link -> population = getFloatFromString(string, &j);
         link -> prospNumber = getIntFromString(string, &j);
-        link -> prosp = createProsp(baseProspString, numProspString);
+        link -> prosp = createProsp(baseProspString, link -> prospNumber, countProsp);
     }
     return link;
 }
 
-city *createCity(char **baseString, int numString, char ***baseProspString, int* numProspString) {
-
-
+city *createCity(char **baseString, int numString, char **baseProspString) {
     city *head = NULL, *link = NULL;
-
-    head = link = createCityNode(baseString[0], baseProspString[0], numProspString[0]);
-
+    static int countProsp = 0;
+    head = link = createCityNode(baseString[0], baseProspString, &countProsp);
     link->prev = NULL;
     for (int i = 1; i < numString; i++) {
         //вычленить кусок массива из общего исходного массива
-        link->next = createCityNode(baseString[i], baseProspString[i], numProspString[i]);
+        link->next = createCityNode(baseString[i], baseProspString, &countProsp);
         link->next->prev = link;
         link = link->next;
     }
-
     link->next = NULL;
-
     return head;
 }
 
 char **getStrArray (int *numString) {
-
     char *wayToFile = NULL;
     printf("Enter the way to the file: ");
     wayToFile = getStr();
@@ -261,129 +252,46 @@ char **getStrArray (int *numString) {
     }
 }
 
-char ***separateStringArray(char **stringArray, int numString) {
-
-
-
-}
-
-/*
-city *create(int numNodes) {
-
-    city *head = NULL, *link = NULL;
-
-    head = link = (city *)malloc(sizeof(city));
-
-    printf("Enter the name of the city: ");
-    scanf("%s",link -> name);
-
-    printf("Enter the foundation date of %s: ", link -> name);
-    scanf("%u", &(link -> foundation));
-
-    printf("Enter the population of %s built in %u: ", link -> name, link -> foundation);
-    scanf("%f", &(link -> population));
-
-    printf("Enter the number of prospects in %s (%f mln people) built in %u: ", link -> name, link -> population,
-           link -> foundation);
-    scanf("%u", &(link -> prospNumber));
-
-    head -> prev = NULL;
-
-    for (int i = 1; i < numNodes; i++) {
-
-        link -> next = (city *)malloc(sizeof(city));
-        link -> next -> prev = link;
-        link = link -> next;
-
-
-        printf("Enter the name of the city: ");
-        scanf("%s", link -> name);
-
-        printf("Enter the foundation date of %s: ", link -> name);
-        scanf("%u", &(link -> foundation));
-
-        printf("Enter the population of %s built in %u: ", link -> name, link -> foundation);
-        scanf("%f", &(link -> population));
-
-        printf("Enter the number of prospects in %s (%f mln people) built in %u: ", link -> name, link -> population,
-               link -> foundation);
-        scanf("%u", &(link -> prospNumber));
-
-    }
-
-    link -> next = NULL;
-    return head;
-}
-*/
-/*
-char **getTextFromFile() {
-
-    FILE *dataFile = NULL;
-    dataFile = fopen("/Users/artemkaloev/GitControl/CourseMain/COURSEMAIN/dataFile.txt", "r");
-
-    char **stringArray = NULL;
-
-
-
-
-
-
-}
-*/
-
 int main() {
 
-
     printf ("\nEnterpoint\n\n");
-    city *head = NULL;
-    char **cityStringArray = NULL; int num1 = 2;
-    cityStringArray = (char **)malloc(num1 * sizeof(char*));
-    cityStringArray[0] = "Moscow 801 12.546 3";
-    cityStringArray[1] = "SPb 103 127.654 1";
 
-    char ***prospStringArray = NULL;
-    int *prospNum = NULL;
-    prospNum = (int *)malloc(2 * sizeof(int));
-    prospNum[0] = 3;
-    prospNum[1] = 1;
-    prospStringArray = (char ***)malloc(2 * sizeof(char**));
-    prospStringArray[0] = (char **)malloc(3 * sizeof(char*));
-    prospStringArray[1] = (char **)malloc(sizeof(char*));
-
-
-    prospStringArray[0][0] = "Borovaya 21";
-    prospStringArray[0][1] = "Moscovskaya 111";
-    prospStringArray[0][2] = "Kulich 78";
-
-    prospStringArray[1][0] = "Gorod 222";
-
-
-
-
-
-    head = createCity(cityStringArray, num1, prospStringArray, prospNum);
-
-    printCityList(head);
-    //printCityListReverse(head);
-
-    printf("Endpoint1\n");
-
-    int numString = 0;
-    char **stringArray = NULL;
-    //FILE *dataFile = NULL;
+    int numStringCity = 0, numStringProsp = 0;
+    char **stringArrayCity = NULL, **stringArrayProsp = NULL;
     //dataFile = fopen("/Users/artemkaloev/GitControl/CourseMain/COURSEMAIN/dataFile.txt", "r");
-    stringArray = getStrArray(&numString);
+    ///Users/artemkaloev/GitControl/CourseMain/COURSEMAIN/dataProspFile.txt
+    stringArrayCity = getStrArray(&numStringCity);
+    stringArrayProsp = getStrArray(&numStringProsp);
 
-        for (int i = 0; i < numString; i++) {
-            for (int j = 0; stringArray[i][j] != '\0'; j++) {
-                printf("%c", stringArray[i][j]);
-            }
-            printf("\n");
+    printf("\nCity: \n");
+    for (int i = 0; i < numStringCity; i++) {
+        for (int j = 0; stringArrayCity[i][j] != '\0'; j++) {
+            printf("%c", stringArrayCity[i][j]);
         }
-        //printf("the end of chararrstr\n");
+        printf("\n");
+    }
 
+    printf("\nProsp: \n");
+    for (int i = 0; i < numStringProsp; i++) {
+        for (int j = 0; stringArrayProsp[i][j] != '\0'; j++) {
+            printf("%c", stringArrayProsp[i][j]);
+        }
+        printf("\n");
+    }
+
+    city *mainHead = NULL;
+    mainHead = createCity(stringArrayCity, numStringCity, stringArrayProsp);
+
+    printCityList(mainHead);
+
+
+    //проблемы: флоат 0 без точки = краш
 
     printf("Endpoint2\n");
     return 0;
 }
+
+
+//Добавление элемента списказ
+
 
