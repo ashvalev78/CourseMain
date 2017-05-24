@@ -228,6 +228,45 @@ city *createCity(char **baseString, int numString, char ***baseProspString, int*
     return head;
 }
 
+char **getStrArray (int *numString) {
+
+    char *wayToFile = NULL;
+    printf("Enter the way to the file: ");
+    wayToFile = getStr();
+
+    FILE *dataFile = NULL;
+    char **stringArray = NULL;
+
+    //проверка на успешное открытие файла
+    if ((dataFile = fopen(wayToFile, "r")) != NULL) {
+        fseek(dataFile, 0, SEEK_END);
+        int file_size = ftell(dataFile);
+        if (file_size != 0) {
+            fseek(dataFile, 0, SEEK_SET);
+            int i;
+            for (i = 0; !feof(dataFile); i++) {
+                stringArray = (char **) realloc(stringArray, (i + 1) * sizeof(char *));
+                stringArray[i] = NULL;
+                int j = -1;
+                do {
+                    j++;
+                    stringArray[i] = (char *) realloc(stringArray[i], (j + 1) * sizeof(char));
+                    memoryCheck(stringArray[i]);
+                } while ((stringArray[i][j] = (char) fgetc(dataFile)) != '\n' && stringArray[i][j] != EOF);
+                stringArray[i][j] = '\0';
+            }
+            *numString = i;
+            return stringArray;
+        }
+    }
+}
+
+char ***separateStringArray(char **stringArray, int numString) {
+
+
+
+}
+
 /*
 city *create(int numNodes) {
 
@@ -327,7 +366,24 @@ int main() {
     printCityList(head);
     //printCityListReverse(head);
 
-    printf("Endpoint\n");
+    printf("Endpoint1\n");
+
+    int numString = 0;
+    char **stringArray = NULL;
+    //FILE *dataFile = NULL;
+    //dataFile = fopen("/Users/artemkaloev/GitControl/CourseMain/COURSEMAIN/dataFile.txt", "r");
+    stringArray = getStrArray(&numString);
+
+        for (int i = 0; i < numString; i++) {
+            for (int j = 0; stringArray[i][j] != '\0'; j++) {
+                printf("%c", stringArray[i][j]);
+            }
+            printf("\n");
+        }
+        //printf("the end of chararrstr\n");
+
+
+    printf("Endpoint2\n");
     return 0;
 }
 
