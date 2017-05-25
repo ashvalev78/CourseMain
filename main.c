@@ -49,7 +49,7 @@ char **FGetABase(int *num) {
             Amass[*num] = (char*)realloc(Amass[*num], (j + 1) * sizeof(char));
             if (Amass[*num][j - 1] == '\n') {
                 Amass[*num][j - 1] = '\0';
-                printf("%s\n", Amass[*num]);
+                //printf("%s\n", Amass[*num]);
                 (*num)++;
                 Amass = (char**)realloc(Amass, (*num + 1) * sizeof(char*));
                 Amass[*num] = (char*)malloc(sizeof(char));
@@ -98,15 +98,6 @@ BOOK *BooksListFromString(char **str, int num, int *quan) { // Функция д
         //printf("%s\n", tmp->name);
         if (str[strnum][j] == ' ') {
             tmp->year = getnum(&j, strnum, str);
-            /*j++;
-            p = 3;
-            tmp->year = (str[strnum][j] - '0')*((int)pow(10, p));
-            j++;
-            for (p = 2; str[strnum][j] != '\0'; p--, j++) {
-                tmp->year += (str[strnum][j] - '0') * ((int)pow(10, p));
-            }
-            if (p >= 0)
-            tmp->year = tmp->year / ((int)pow(10, p + 1));*/
         }
         //printf("%d\n", tmp->year);
         head = tmp;
@@ -179,25 +170,25 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass, int Bnum) { // 
     return nhead;
 }
 
-BOOK *DeleteBElement (BOOK *head, int num) {
+BOOK *DeleteBElement(BOOK *head, int delNumber) {
     if (head != NULL) {
         BOOK *tmp = head;
-        int i;
-        for (i = 1; i < num && tmp->next != NULL; i++)
+        for (int i = 1; i < delNumber; i++) {
+            if (tmp->next == NULL) return head;
             tmp = tmp->next;
-        if (i < num) {
-            printf("No book-element with this number!\n");
-            return NULL;
         }
-        if (tmp == head) {
-            head = head->next;
-            if (head != NULL)
-                head->prev = NULL;
-        }
-        else {
-            tmp->prev = tmp->next;
-            if (tmp->next != NULL)
-                tmp->next->prev = tmp->prev;
+        if (delNumber == 1) {
+            if (tmp->next == NULL) {
+                head = NULL;
+            } else {
+                tmp->next->prev = NULL;
+                head = tmp->next;
+            }
+        } else if (tmp->next == NULL) {
+            tmp->prev->next = NULL;
+        } else {
+            tmp->prev->next = tmp->next;
+            tmp->next->prev = tmp->prev;
         }
         free(tmp->name);
         free(tmp);
@@ -205,71 +196,62 @@ BOOK *DeleteBElement (BOOK *head, int num) {
     return head;
 }
 
-BOOK *DeleteBFrag (BOOK *head, int num1, int num2) {
-    for (int i = num1; i <= num2; i++)
+BOOK *DeleteBFrag(BOOK *head, int num1, int num2) {
+    for (int i = num1; i <= num2; i++) {
         head = DeleteBElement(head, num1);
+    }
     return head;
 }
 
-AUTHOR *DeleteAElement (AUTHOR *head, int num) {
-    printf("OK\n");
+AUTHOR *DeleteAElement(AUTHOR *head, int delNumber) {
     if (head != NULL) {
         AUTHOR *tmp = head;
-        int i;
-        for (i = 1; i < num && tmp->next != NULL; i++)
+        for (int i = 1; i < delNumber; i++) {
+            if (tmp->next == NULL) return head;
             tmp = tmp->next;
-        if (i < num) {
-            printf("No author-element with this number!\n");
-            return NULL;
         }
-        if (tmp == head) {
-            head = head->next;
-            if (head != NULL)
-                head->prev = NULL;
+        if (delNumber == 1) {
+            if (tmp->next == NULL) {
+                head = NULL;
+            } else {
+                tmp->next->prev = NULL;
+                head = tmp->next;
+            }
+        } else if (tmp->next == NULL) {
+            tmp->prev->next = NULL;
+        } else {
+            tmp->prev->next = tmp->next;
+            tmp->next->prev = tmp->prev;
         }
-        else {
-            tmp->prev = tmp->next;
-            if (tmp->next != NULL)
-                tmp->next->prev = tmp->prev;
-        }
-        tmp->books = DeleteBFrag(tmp->books, 1, tmp->numbook);
-        free(tmp->books);
         free(tmp->name);
         free(tmp->surname);
+        tmp->books = DeleteBFrag(tmp->books, 1, tmp->numbook);
         free(tmp);
     }
     return head;
 }
 
-AUTHOR *DeleteAFrag (AUTHOR *head, int num1, int num2) {
+AUTHOR *DeleteAFrag(AUTHOR *head, int num1, int num2) {
     for (int i = num1; i <= num2; i++)
         head = DeleteAElement(head, num1);
     return head;
 }
 
-/*char **GetArrayFromKeyboard() {
-    int i = 0;
-    char ch = NULL, **Array = NULL;
-    while ((ch = getch()) != '`') {
-        Array[i] =
-    }
-    return Array;
-}*/
+AUTHOR *AddElement
 
 void PrintBList (BOOK *Blist) {
     if (Blist == NULL) printf("NO BOOKS!\n");
     else {
         for (BOOK *tmp = Blist; tmp != NULL; tmp = tmp->next)
-            printf("%s\t%d\n", tmp->name, tmp->year);
+            printf("BOOK:\t%s %d\n", tmp->name, tmp->year);
     }
 };
 
 void PrintAList (AUTHOR *Alist) {
-    printf("I'M TRYING!!!!!!!!\n");
     if (Alist == NULL) printf("NO AUTHOR LIST!\n");
     else {
         for (AUTHOR *tmp = Alist; tmp != NULL; tmp = tmp->next) {
-            printf("%s\t%s\t%d-%d\t%d\n", tmp->name, tmp->surname, tmp->birth, tmp->death, tmp->numbook);
+            printf("AUTHOR:\t%s %s %d-%d %d\n", tmp->name, tmp->surname, tmp->birth, tmp->death, tmp->numbook);
             PrintBList(tmp->books);
         }
     }
@@ -282,7 +264,8 @@ int main()
     char **Books = FGetABase(&Bnum);// Получение массива книг из файла
     AUTHOR *Ahead = AuthListFromString(Auth, Anum, Books, Bnum); // преобразование массивов авторов и книг в списки.
     PrintAList(Ahead);
-    Ahead = DeleteAFrag(Ahead, 1, 3);
+    printf("******************************************************************************\n");
+    //Ahead = DeleteAFrag(Ahead, 2, 3);
     PrintAList(Ahead);
     return 0;
 }
