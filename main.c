@@ -3,6 +3,13 @@
 #include <conio.h>
 #include <math.h>
 
+typedef struct BOOK {
+    char *name;
+    int year;
+    struct BOOK *next;
+    struct BOOK *prev;
+} BOOK;
+
 typedef struct AUTHOR {
     char *name;
     char *surname;
@@ -13,13 +20,6 @@ typedef struct AUTHOR {
     struct AUTHOR *next;
     struct AUTHOR *prev;
 } AUTHOR;
-
-typedef struct BOOK {
-    char *name;
-    int year;
-    struct BOOK *next;
-    struct BOOK *prev;
-} BOOK;
 
 char *getstr() {
     int i = -1;
@@ -180,14 +180,78 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass, int Bnum) { // 
     return nhead;
 }
 
-char **GetArrayFromKeyboard() {
+BOOK *DeleteBElement (BOOK *head, int num) {
+    if (head != NULL) {
+        BOOK *tmp = head;
+        int i;
+        for (i = 1; i < num && tmp->next != NULL; i++)
+            tmp = tmp->next;
+        if (i < num) {
+            printf("No book-element with this number!\n");
+            return NULL;
+        }
+        if (tmp == head) {
+            head = head->next;
+        }
+        else {
+            tmp->prev = tmp->next;
+            if (tmp->next != NULL)
+                tmp->next->prev = tmp->prev;
+        }
+        free(tmp->name);
+        free(tmp);
+    }
+    return head;
+}
+
+BOOK *DeleteBFrag (BOOK *head, int num1, int num2) {
+    for (int i = num2; i > num1; i--) {
+        head = DeleteBElement(head, i);
+    }
+    return head;
+}
+
+AUTHOR *DeleteAElement (AUTHOR *head, int num) {
+    if (head != NULL) {
+        AUTHOR *tmp = head;
+        int i;
+        for (i = 1; i < num && tmp->next != NULL; i++)
+            tmp = tmp->next;
+        if (i < num) {
+            printf("No author-element with this number!\n");
+            return NULL;
+        }
+        if (tmp == head) {
+            head = head->next;
+        }
+        else {
+            tmp->prev = tmp->next;
+            if (tmp->next != NULL)
+                tmp->next->prev = tmp->prev;
+        }
+        tmp->books = DeleteBFrag(tmp->books, 1, tmp->numbook);
+        free(tmp->books);
+        free(tmp->name);
+        free(tmp->surname);
+        free(tmp);
+    }
+    return head;
+}
+
+AUTHOR *DeleteAFrag (AUTHOR *head, int num1, int num2) {
+
+    return head;
+}
+
+
+/*char **GetArrayFromKeyboard() {
     int i = 0;
     char ch = NULL, **Array = NULL;
     while ((ch = getch()) != '`') {
         Array[i] =
     }
     return Array;
-}
+}*/
 
 void Afree(AUTHOR *head) {
     if (head != NULL) {
@@ -222,9 +286,9 @@ void PrintAList (AUTHOR *Alist) {
 int main()
 {
     int Anum = 0, Bnum = 0;
-    char **Auth = FGetABase(&Anum);
-    char **Books = FGetABase(&Bnum);
-    AUTHOR *Ahead = AuthListFromString(Auth, Anum, Books, Bnum);
+    char **Auth = FGetABase(&Anum); // Получение массива авторов из файла
+    char **Books = FGetABase(&Bnum);// Получение массива книг из файла
+    AUTHOR *Ahead = AuthListFromString(Auth, Anum, Books, Bnum); // преобразование массивов авторов и книг в списки.
     PrintAList(Ahead);
     return 0;
 }
