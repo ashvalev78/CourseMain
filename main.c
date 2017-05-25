@@ -32,12 +32,11 @@ char *getstr() {
     return string;
 }
 
-
 char **FGetABase(int *num) {
     FILE *base;
     char **Amass = NULL;
     int j = 0;
-    printf("Enter the way to the author file\n");
+    printf("Enter the way to the file\n");
     if ((base = fopen(getstr(), "r")) != NULL) {
         fseek(base, 0, SEEK_END);
         if (ftell(base) == 0) return NULL;
@@ -118,7 +117,7 @@ BOOK *BooksListFromString(char **str, int num, int *quan) { // Функция д
     }
     strnum++;
     return nhead;
-}
+} // quan - количество книг автора.
 
 AUTHOR *AuthListFromString(char **str, int num, char **BookMass, int Bnum) { // Функция создания списка авторов из полученного списка строк. Функция для работы с файлом.
     AUTHOR *nhead = NULL, *head = NULL, *tmp;
@@ -192,6 +191,8 @@ BOOK *DeleteBElement (BOOK *head, int num) {
         }
         if (tmp == head) {
             head = head->next;
+            if (head != NULL)
+                head->prev = NULL;
         }
         else {
             tmp->prev = tmp->next;
@@ -205,13 +206,13 @@ BOOK *DeleteBElement (BOOK *head, int num) {
 }
 
 BOOK *DeleteBFrag (BOOK *head, int num1, int num2) {
-    for (int i = num2; i > num1; i--) {
-        head = DeleteBElement(head, i);
-    }
+    for (int i = num1; i <= num2; i++)
+        head = DeleteBElement(head, num1);
     return head;
 }
 
 AUTHOR *DeleteAElement (AUTHOR *head, int num) {
+    printf("OK\n");
     if (head != NULL) {
         AUTHOR *tmp = head;
         int i;
@@ -223,6 +224,8 @@ AUTHOR *DeleteAElement (AUTHOR *head, int num) {
         }
         if (tmp == head) {
             head = head->next;
+            if (head != NULL)
+                head->prev = NULL;
         }
         else {
             tmp->prev = tmp->next;
@@ -239,10 +242,10 @@ AUTHOR *DeleteAElement (AUTHOR *head, int num) {
 }
 
 AUTHOR *DeleteAFrag (AUTHOR *head, int num1, int num2) {
-
+    for (int i = num1; i <= num2; i++)
+        head = DeleteAElement(head, num1);
     return head;
 }
-
 
 /*char **GetArrayFromKeyboard() {
     int i = 0;
@@ -253,18 +256,8 @@ AUTHOR *DeleteAFrag (AUTHOR *head, int num1, int num2) {
     return Array;
 }*/
 
-void Afree(AUTHOR *head) {
-    if (head != NULL) {
-        while (head->next != NULL) {
-            head = head->next;
-            free(head->prev);
-        }
-        free(head);
-    }
-}
-
 void PrintBList (BOOK *Blist) {
-    if (Blist == NULL) printf("NO BOOK LIST!\n");
+    if (Blist == NULL) printf("NO BOOKS!\n");
     else {
         for (BOOK *tmp = Blist; tmp != NULL; tmp = tmp->next)
             printf("%s\t%d\n", tmp->name, tmp->year);
@@ -272,13 +265,12 @@ void PrintBList (BOOK *Blist) {
 };
 
 void PrintAList (AUTHOR *Alist) {
+    printf("I'M TRYING!!!!!!!!\n");
     if (Alist == NULL) printf("NO AUTHOR LIST!\n");
     else {
         for (AUTHOR *tmp = Alist; tmp != NULL; tmp = tmp->next) {
             printf("%s\t%s\t%d-%d\t%d\n", tmp->name, tmp->surname, tmp->birth, tmp->death, tmp->numbook);
-            if (tmp->books != NULL)
             PrintBList(tmp->books);
-            else printf("No books\n");
         }
     }
 };
@@ -289,6 +281,8 @@ int main()
     char **Auth = FGetABase(&Anum); // Получение массива авторов из файла
     char **Books = FGetABase(&Bnum);// Получение массива книг из файла
     AUTHOR *Ahead = AuthListFromString(Auth, Anum, Books, Bnum); // преобразование массивов авторов и книг в списки.
+    PrintAList(Ahead);
+    Ahead = DeleteAFrag(Ahead, 1, 3);
     PrintAList(Ahead);
     return 0;
 }
