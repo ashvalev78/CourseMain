@@ -252,6 +252,56 @@ char **getStrArray (int *numString) {
     }
 }
 
+prospect *deleteProsp(prospect *headProsp, int delNumber) {
+
+    if (headProsp != NULL) {
+        prospect *link = headProsp;
+        printf("P-1\n");
+        for (int i = 1; i < delNumber; i++) {
+            if (link->next == NULL) return headProsp;
+            link = link->next;
+        }
+        printf("P-2\n");
+
+        if (delNumber == 1) {
+            link -> next -> prev = NULL;
+            headProsp = link -> next;
+        } else if (link -> next == NULL) {
+            link -> prev -> next = NULL;
+        } else {
+            link->prev->next = link->next;
+            link->next->prev = link->prev;
+        }
+        printf("P-3\n");
+
+        free(link->name);
+        free(link);
+        printf("P-4\n");
+    }
+    return headProsp;
+}
+
+prospect *addProspNode(city *headCity, prospect *headProsp, const char* SET_VALUE) {
+
+    /*
+     * Функция добавляет элемент в начало, конец списка, либо после заданного номера в списке.
+     * Если список пуст - создает и добавляет в список первый элемент.
+     *
+
+    switch (SET_VALUE) {
+        case "END":
+
+    }
+
+
+    prospect *link = headProsp;
+    link = createProspNode(link);
+    link -> next = NULL;
+*/
+    return NULL;
+
+}
+
 int main() {
 
     printf ("\nEnterpoint\n\n");
@@ -283,11 +333,21 @@ int main() {
     mainHead = createCity(stringArrayCity, numStringCity, stringArrayProsp);
 
     printCityList(mainHead);
+    //printCityListReverse(mainHead);
+
+    printf("Endpoint2\n");
+
+    mainHead -> prosp = deleteProsp(mainHead -> prosp, 1);
+    printCityList(mainHead);
 
 
     //проблемы: флоат 0 без точки = краш
 
-    printf("Endpoint2\n");
+    printf("Endpoint3\n");
+
+
+
+    printf("ENDPOINT\n");
     return 0;
 }
 
