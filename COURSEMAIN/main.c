@@ -126,7 +126,7 @@ void printCityListReverse(city *head) {
 unsigned int getIntFromString(char *string, int *firstPosition) {
     unsigned int N = 0;
     int *j = firstPosition, elderPositionU;
-    for (elderPositionU = 0; string[++*j] != ' ' && string[*j] != '\0' && string[*j] != '.'; elderPositionU++);
+    for (elderPositionU = 0; string[++*j] != ' ' && string[*j] != '\0' && string[*j] != '.' && string[*j] != '\n'; elderPositionU++);
 
     int k;
     for (k = elderPositionU; k > 1; k--) {
@@ -220,10 +220,20 @@ city *createCity(char **baseString, int numString, char **baseProspString) {
     return head;
 }
 
-char **getStrArray() {
-    char stringArray = NULL;
-    printf("Enter ");
-    return NULL;
+char **getStrArray(int *numString) {
+    int SET_POSITION = -1;
+    char **stringArray = NULL;
+    printf("Enter number of nodes: ");
+    *numString = getIntFromString(getStr(), &SET_POSITION);
+    printf("%d\n", *numString);
+
+    for (int i = 0; i < *numString; i++) {
+        stringArray = (char **) realloc(stringArray, (i + 1) * sizeof(char *));
+        stringArray[i] = NULL;
+        stringArray[i] = getStr();
+    }
+
+    return stringArray;
 }
 
 char **getStrArrayFromFile (int *numString) {
@@ -356,6 +366,18 @@ prospect *addProspNode(city *headCity, prospect *headProsp, const char* SET_VALU
 int main() {
 
     printf ("\nEnterpoint\n\n");
+
+    char **prospectStringBatya = NULL;
+    int numBatyaStringArr;
+    prospectStringBatya = getStrArray(&numBatyaStringArr);
+    printf("\nProsp: \n");
+    for (int i = 0; i < numBatyaStringArr; i++) {
+        for (int j = 0; prospectStringBatya[i][j] != '\0'; j++) {
+            printf("%c", prospectStringBatya[i][j]);
+        }
+        printf("\n");
+    }
+    printf("Endpoint5\n");
 
     int numStringCity = 0, numStringProsp = 0;
     char **stringArrayCity = NULL, **stringArrayProsp = NULL;
