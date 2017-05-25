@@ -253,32 +253,38 @@ char **getStrArray (int *numString) {
 }
 
 prospect *deleteProsp(prospect *headProsp, int delNumber) {
-
     if (headProsp != NULL) {
         prospect *link = headProsp;
-        printf("P-1\n");
         for (int i = 1; i < delNumber; i++) {
             if (link->next == NULL) return headProsp;
             link = link->next;
         }
-        printf("P-2\n");
-
         if (delNumber == 1) {
-            link -> next -> prev = NULL;
-            headProsp = link -> next;
+            if (link -> next == NULL) {
+                headProsp = NULL;
+            } else {
+                link->next->prev = NULL;
+                headProsp = link->next;
+            }
         } else if (link -> next == NULL) {
             link -> prev -> next = NULL;
         } else {
             link->prev->next = link->next;
             link->next->prev = link->prev;
         }
-        printf("P-3\n");
-
         free(link->name);
         free(link);
-        printf("P-4\n");
     }
     return headProsp;
+}
+
+prospect *deleteIntervalProsp(prospect *headProsp, int setPosition1, int setPosition2) {
+
+    int SET_NUM_DEL_NODES = setPosition2 - setPosition1 + 1;
+    for (int i = 0; i < SET_NUM_DEL_NODES; i++) {
+        headProsp = deleteProsp(headProsp, setPosition1);
+        printProspList(headProsp);
+    }
 }
 
 prospect *addProspNode(city *headCity, prospect *headProsp, const char* SET_VALUE) {
@@ -308,8 +314,11 @@ int main() {
 
     int numStringCity = 0, numStringProsp = 0;
     char **stringArrayCity = NULL, **stringArrayProsp = NULL;
-    //dataFile = fopen("/Users/artemkaloev/GitControl/CourseMain/COURSEMAIN/dataFile.txt", "r");
-    ///Users/artemkaloev/GitControl/CourseMain/COURSEMAIN/dataProspFile.txt
+    /*
+    /Users/artemkaloev/GitControl/CourseMain/COURSEMAIN/dataFile.txt
+    /Users/artemkaloev/GitControl/CourseMain/COURSEMAIN/dataProspFile.txt
+     */
+
     stringArrayCity = getStrArray(&numStringCity);
     stringArrayProsp = getStrArray(&numStringProsp);
 
@@ -337,9 +346,9 @@ int main() {
 
     printf("Endpoint2\n");
 
-    mainHead -> prosp = deleteProsp(mainHead -> prosp, 1);
-    printCityList(mainHead);
+    int setPosition1 = 1, setPosition2 = 3;
 
+    mainHead -> prosp = deleteIntervalProsp(mainHead -> prosp, setPosition1, setPosition2);
 
     //проблемы: флоат 0 без точки = краш
 
