@@ -220,7 +220,13 @@ city *createCity(char **baseString, int numString, char **baseProspString) {
     return head;
 }
 
-char **getStrArray (int *numString) {
+char **getStrArray() {
+    char stringArray = NULL;
+    printf("Enter ");
+    return NULL;
+}
+
+char **getStrArrayFromFile (int *numString) {
     char *wayToFile = NULL;
     printf("Enter the way to the file: ");
     wayToFile = getStr();
@@ -252,7 +258,8 @@ char **getStrArray (int *numString) {
     }
 }
 
-prospect *deleteProsp(prospect *headProsp, int delNumber) {
+prospect *deleteProsp(city *linkCity, int delNumber) {
+    prospect *headProsp = linkCity -> prosp;
     if (headProsp != NULL) {
         prospect *link = headProsp;
         for (int i = 1; i < delNumber; i++) {
@@ -272,19 +279,20 @@ prospect *deleteProsp(prospect *headProsp, int delNumber) {
             link->prev->next = link->next;
             link->next->prev = link->prev;
         }
+        (linkCity -> prospNumber)--;
         free(link->name);
         free(link);
     }
     return headProsp;
 }
 
-prospect *deleteIntervalProsp(prospect *headProsp, int setPosition1, int setPosition2) {
+prospect *deleteIntervalProsp(city* linkCity, int setPosition1, int setPosition2) {
 
     for (int i = setPosition1; i <= setPosition2; i++) {
-        headProsp = deleteProsp(headProsp, setPosition1);
-        printProspList(headProsp);
+        linkCity -> prosp = deleteProsp(linkCity, setPosition1);
+        printProspList(linkCity -> prosp);
     }
-    return headProsp;
+    return linkCity -> prosp;
 }
 
 city *deleteCity(city *headCity, int delNumber) {
@@ -307,7 +315,7 @@ city *deleteCity(city *headCity, int delNumber) {
             link->prev->next = link->next;
             link->next->prev = link->prev;
         }
-        link -> prosp = deleteIntervalProsp(link -> prosp, 1, link -> prospNumber);
+        link -> prosp = deleteIntervalProsp(link, 1, link -> prospNumber);
         free(link->name);
         free(link);
     }
@@ -356,8 +364,8 @@ int main() {
     /Users/artemkaloev/GitControl/CourseMain/COURSEMAIN/dataProspFile.txt
      */
 
-    stringArrayCity = getStrArray(&numStringCity);
-    stringArrayProsp = getStrArray(&numStringProsp);
+    stringArrayCity = getStrArrayFromFile(&numStringCity);
+    stringArrayProsp = getStrArrayFromFile(&numStringProsp);
 
     /*
     printf("\nCity: \n");
@@ -394,7 +402,9 @@ int main() {
     printf("Endpoint3\n");
     printCityList(mainHead);
 
-
+    printf("Endpoint4\n");
+    mainHead -> prosp = deleteProsp(mainHead, 1);
+    printCityList(mainHead);
 
     printf("ENDPOINT\n");
     return 0;
