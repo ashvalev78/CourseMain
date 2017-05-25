@@ -280,11 +280,48 @@ prospect *deleteProsp(prospect *headProsp, int delNumber) {
 
 prospect *deleteIntervalProsp(prospect *headProsp, int setPosition1, int setPosition2) {
 
-    int SET_NUM_DEL_NODES = setPosition2 - setPosition1 + 1;
-    for (int i = 0; i < SET_NUM_DEL_NODES; i++) {
+    for (int i = setPosition1; i <= setPosition2; i++) {
         headProsp = deleteProsp(headProsp, setPosition1);
         printProspList(headProsp);
     }
+    return headProsp;
+}
+
+city *deleteCity(city *headCity, int delNumber) {
+    if (headCity != NULL) {
+        city *link = headCity;
+        for (int i = 1; i < delNumber; i++) {
+            if (link->next == NULL) return headCity;
+            link = link->next;
+        }
+        if (delNumber == 1) {
+            if (link -> next == NULL) {
+                headCity = NULL;
+            } else {
+                link->next->prev = NULL;
+                headCity = link->next;
+            }
+        } else if (link -> next == NULL) {
+            link -> prev -> next = NULL;
+        } else {
+            link->prev->next = link->next;
+            link->next->prev = link->prev;
+        }
+        link -> prosp = deleteIntervalProsp(link -> prosp, 1, link -> prospNumber);
+        free(link->name);
+        free(link);
+    }
+    return headCity;
+}
+
+city *deleteIntervalCity(city *headCity, int setPosition1, int setPosition2) {
+
+    for (int i = setPosition1; i <= setPosition2; i++) {
+        headCity = deleteCity(headCity, setPosition1);
+        printCityList(headCity);
+    }
+    return headCity;
+
 }
 
 prospect *addProspNode(city *headCity, prospect *headProsp, const char* SET_VALUE) {
@@ -322,6 +359,7 @@ int main() {
     stringArrayCity = getStrArray(&numStringCity);
     stringArrayProsp = getStrArray(&numStringProsp);
 
+    /*
     printf("\nCity: \n");
     for (int i = 0; i < numStringCity; i++) {
         for (int j = 0; stringArrayCity[i][j] != '\0'; j++) {
@@ -337,6 +375,7 @@ int main() {
         }
         printf("\n");
     }
+     */
 
     city *mainHead = NULL;
     mainHead = createCity(stringArrayCity, numStringCity, stringArrayProsp);
@@ -346,13 +385,14 @@ int main() {
 
     printf("Endpoint2\n");
 
-    int setPosition1 = 1, setPosition2 = 3;
+    int setPosition1 = 1, setPosition2 = 1;
 
-    mainHead -> prosp = deleteIntervalProsp(mainHead -> prosp, setPosition1, setPosition2);
-
+    mainHead = deleteIntervalCity(mainHead,setPosition1, setPosition2);
+    //printCityList(mainHead);
     //проблемы: флоат 0 без точки = краш
 
     printf("Endpoint3\n");
+    printCityList(mainHead);
 
 
 
