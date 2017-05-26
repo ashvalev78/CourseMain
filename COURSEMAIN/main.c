@@ -21,6 +21,9 @@ typedef struct city {
 
 } city;
 
+char **sumArrays(char **firstArray, char** secondArray, int firstNum, int SecondNum);
+
+city *getCityListFromConsole();
 
 void memoryCheck(void *pointer)
 {
@@ -161,7 +164,6 @@ char *getSubstringFromString(char *string, int *numPosition) {
     return substring;
 }
 
-
 prospect *createProspNode(char *string) {
     prospect *link = NULL;
     if (string[0] != '\0') {
@@ -173,6 +175,7 @@ prospect *createProspNode(char *string) {
     return link;
 }
 
+//numString - количество проспектов для данного города,  countProsp - номер элемента, с которого начинается считывание всего массива строк
 prospect *createProsp(char **baseString, int numString, int *countProsp) {
     prospect *head = NULL, *link = NULL;
     if (numString != 0) {
@@ -189,7 +192,6 @@ prospect *createProsp(char **baseString, int numString, int *countProsp) {
     (*countProsp)++;
     return head;
 }
-
 
 city *createCityNode(char *string, char **baseProspString, int *countProsp) {
     city *link = NULL;
@@ -220,19 +222,23 @@ city *createCity(char **baseString, int numString, char **baseProspString) {
     return head;
 }
 
-char **getStrArray(int *numString) {
+char **getStrArray(int *numString, int prosp) {
     int SET_POSITION = -1;
     char **stringArray = NULL;
     printf("Enter number of nodes: ");
     *numString = getIntFromString(getStr(), &SET_POSITION);
     printf("%d\n", *numString);
-
-    for (int i = 0; i < *numString; i++) {
+    int i;
+    for (i = 0; i < *numString; i++) {
         stringArray = (char **) realloc(stringArray, (i + 1) * sizeof(char *));
         stringArray[i] = NULL;
         stringArray[i] = getStr();
     }
-
+    if (prosp) {
+        stringArray = (char**)realloc(stringArray, (i + 1) * sizeof(char*));
+        stringArray[i] = "~\n";
+        (*numString)++;
+    }
     return stringArray;
 }
 
@@ -342,37 +348,177 @@ city *deleteIntervalCity(city *headCity, int setPosition1, int setPosition2) {
 
 }
 
-prospect *addProsp(prospect *head, int addNumber, char *string) {
+city *addIntervalProsp(city *linkCity) {
+    //numAddNodes - кол-во проспектов, которые добавятся в список, positiontoAdd - позиция, после которой будет всталвен элемент
+    printf("Enter the position of node after which nodes will be added: ");
+    int numberAddNodes, SET_POSITION_1 = -1, SET_POSITION_2 = 0, positionToAdd = getIntFromString(getStr(), &SET_POSITION_1);
+    prospect *subHead = createProsp(getStrArray(&numberAddNodes, 0), numberAddNodes, &SET_POSITION_2);
+    printProspList(subHead);
+
+    prospect *subTail;
+    for (subTail = subHead; subTail -> next != NULL; subTail = subTail -> next);
+    prospect *link = linkCity -> prosp;
+
+    if (link != NULL) {
+        for (int i = 1; i < positionToAdd && link->next != NULL; link = link->next, i++);
+    }
+
+    if (positionToAdd == 0 || link == NULL) {
+        subTail -> next = linkCity -> prosp;
+        if (linkCity -> prosp != NULL) {
+            linkCity -> prosp -> prev = subTail;
+        }
+        linkCity -> prosp = subHead;
+    } else if (link -> next == NULL) {
+        link -> next = subHead;
+        subHead -> prev = link;
+    } else {
+        subTail -> next = link -> next;
+        link -> next -> prev = subTail;
+        subHead -> prev = link;
+        link -> next = subHead;
+    }
+    return linkCity;
+}
+
+city *addIntervalCity(city *headCity) {
+    printf("Enter the position of node after which nodes will be added: ");
+    int numberAddNodes, SET_POSITION_1 = -1, positionToAdd = getIntFromString(getStr(), &SET_POSITION_1);
+    city *subHead = getCityListFromConsole();
+    printCityList(subHead);
+
+    city *subTail;
+    for (subTail = subHead; subTail -> next != NULL; subTail = subTail -> next);
+
+    city *link = headCity;
+    if (link != NULL) {
+        for (int i = 1; i < positionToAdd && link->next != NULL; link = link->next, i++);
+    }
+
+    if (positionToAdd == 0 || link == NULL) {
+        subTail -> next = headCity;
+        if (headCity != NULL) {
+            headCity -> prev = subTail;
+        }
+        headCity = subHead;
+    } else if (link -> next == NULL) {
+        link -> next = subHead;
+        subHead -> prev = link;
+    } else {
+        subTail -> next = link -> next;
+        link -> next -> prev = subTail;
+        subHead -> prev = link;
+        link -> next = subHead;
+    }
+    return headCity;
+
+}
+
+prospect *addProsp(city* linkCity, int addNumber, prospect *addNode) {
+    prospect *head = linkCity -> prosp;
+    prospect *link = head;
     if (head != NULL) {
-        prospect *link = head;
         for (int i = 1; i < addNumber; i++) {
-            if (link->next == NULL) return NULL;
+            if (link->next == NULL) break;
             link = link->next;
         }
         if (link->next == NULL) {
-            link->next = createProspNode(string);
+            link->next = addNode;
             link->next->prev = link;
             link->next->next = NULL;
         } else {
             prospect *tmp = link -> next;
-            link -> next = createProspNode(string);
+            link -> next = addNode;
             link -> next -> prev = link;
-            link = link -> next;
-            link -> next = tmp;
-            tmp -> prev = link;
+            link -> next -> next = tmp;
+            tmp -> prev = link -> next;
         }
     } else {
-        head = createProspNode(string);
-        head -> next = NULL;
-        head -> prev = NULL;
+        link = addNode;
+        link -> next = NULL;
+        link -> prev = NULL;
+    }
+    link = link -> next;
+    (linkCity -> prospNumber)++;
+    return head;
+}
+
+/*
+prospect *addIntervalProsp(city *linkCity, int addNumber, int numAddNodes, char **strAddNodes) {
+
+    for (int i = 0; i < numAddNodes; i++) {
+        linkCity -> prosp = addProsp(linkCity, addNumber, strAddNodes[i]);
+        printProspList(linkCity -> prosp);
+    }
+    return linkCity -> prosp;
+}
+*/
+
+city *getCityListFromConsole() {
+    city *head = NULL;
+    int cityNum = 0, prospNum1 = 0, prospNum2 = 0;
+    char **cityStringArray = NULL, **prospStringArray1 = NULL, **prospStringArray2 = NULL;
+    cityStringArray = getStrArray(&cityNum, 0);
+    if (cityNum != 0) {
+        prospStringArray1 = getStrArray(&prospNum1, 1);
+        for (int i = 1; i < cityNum; i++) {
+            prospNum2 = 0;
+            prospStringArray2 = getStrArray(&prospNum2, 1);
+            prospStringArray1 = sumArrays(prospStringArray1, prospStringArray2, prospNum1, prospNum2);
+            prospNum1 += prospNum2;
+        }
+        head = createCity(cityStringArray, cityNum, prospStringArray1);
     }
     return head;
 }
 
+char **sumArrays(char **firstArray, char **secondArray, int firstNum, int secondNum) {
+    for (int i = 0; i < secondNum; i++) {
+        firstArray = (char **) realloc(firstArray, (firstNum + i + 1) * sizeof(char *));
+        firstArray[firstNum + i] = secondArray[i];
+    }
+    return firstArray;
+}
+
 int main() {
 
-    int input;
-    printf("");
+
+    int input = 1;
+    printf("Hello! It's enterpoint of the program. Choose one point from the menu below\n\n"
+                   "Press (1) to add node(-s)\n"
+                   "Press (2) to delete node(-s)\n"
+                   "Press (3) to sort nodes\n"
+                   "Press (4) to save changes to the file\n"
+                   "Press (0) to finish the program\n");
+    while (input != 0) {
+        int SET_POSITION = -1;
+        input = getIntFromString(getStr(), &SET_POSITION);
+        switch (input) {
+            case 1:
+                SET_POSITION = -1;
+                printf("Pressed 1\n");
+                city *head = NULL;
+                head = getCityListFromConsole();
+                printCityList(head);
+                head = addIntervalProsp(head);
+                printProspList(head -> prosp);
+                break;
+            case 2:
+                printf("Pressed 2\n");
+                city *head1 = NULL;
+                head1 = getCityListFromConsole();
+                printCityList(head1);
+                head1 = addIntervalCity(head1);
+                printCityList(head1);
+                break;
+            case 0:
+                printf("Pressed 0. Finish the program\n");
+                exit(1);
+            default:
+                break;
+        }
+
+    }
 
 
 
@@ -382,7 +528,7 @@ int main() {
 
     char **cityStringBase = NULL;
     int numCityStringArr;
-    cityStringBase = getStrArray(&numCityStringArr);
+    //cityStringBase = getStrArray(&numCityStringArr);
     printf("\nCity: \n");
     for (int i = 0; i < numCityStringArr; i++) {
         for (int j = 0; cityStringBase[i][j] != '\0'; j++) {
@@ -393,7 +539,7 @@ int main() {
 
     char **prospectStringBase = NULL;
     int numProspStringArr;
-    prospectStringBase = getStrArray(&numProspStringArr);
+    //prospectStringBase = getStrArray(&numProspStringArr);
     printf("\nProsp: \n");
     for (int i = 0; i < numProspStringArr; i++) {
         for (int j = 0; prospectStringBase[i][j] != '\0'; j++) {
