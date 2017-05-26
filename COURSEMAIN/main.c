@@ -25,6 +25,8 @@ char **sumArrays(char **firstArray, char** secondArray, int firstNum, int Second
 
 city *getCityListFromConsole();
 
+void printStringArray(char **stringArray, int numString);
+
 void memoryCheck(void *pointer)
 {
     if (!pointer)
@@ -209,7 +211,7 @@ city *createCityNode(char *string, char **baseProspString, int *countProsp) {
 
 city *createCity(char **baseString, int numString, char **baseProspString) {
     city *head = NULL, *link = NULL;
-    static int countProsp = 0;
+    int countProsp = 0;
     head = link = createCityNode(baseString[0], baseProspString, &countProsp);
     link->prev = NULL;
     for (int i = 1; i < numString; i++) {
@@ -383,7 +385,7 @@ city *addIntervalProsp(city *linkCity) {
 
 city *addIntervalCity(city *headCity) {
     printf("Enter the position of node after which nodes will be added: ");
-    int numberAddNodes, SET_POSITION_1 = -1, positionToAdd = getIntFromString(getStr(), &SET_POSITION_1);
+    int SET_POSITION_1 = -1, positionToAdd = getIntFromString(getStr(), &SET_POSITION_1);
     city *subHead = getCityListFromConsole();
     printCityList(subHead);
 
@@ -460,14 +462,30 @@ city *getCityListFromConsole() {
     char **cityStringArray = NULL, **prospStringArray1 = NULL, **prospStringArray2 = NULL;
     cityStringArray = getStrArray(&cityNum, 0);
     if (cityNum != 0) {
+        printf("cityNum != 0\n");
         prospStringArray1 = getStrArray(&prospNum1, 1);
+        printStringArray(prospStringArray1, prospNum1);
+
         for (int i = 1; i < cityNum; i++) {
             prospNum2 = 0;
             prospStringArray2 = getStrArray(&prospNum2, 1);
+            printStringArray(prospStringArray2, prospNum2);
             prospStringArray1 = sumArrays(prospStringArray1, prospStringArray2, prospNum1, prospNum2);
             prospNum1 += prospNum2;
+            printStringArray(prospStringArray1, prospNum1);
+
         }
+
+        printf("ЩА БУИТ МЯСО! \n---------------\n");
+
+        printStringArray(cityStringArray, cityNum);
+        printStringArray(prospStringArray1, prospNum1);
+
+        printf("---------------------------ЩА БУИТ МЯСО!\n");
+        printf("cityNUM = %d", cityNum);
+
         head = createCity(cityStringArray, cityNum, prospStringArray1);
+
     }
     return head;
 }
@@ -478,6 +496,16 @@ char **sumArrays(char **firstArray, char **secondArray, int firstNum, int second
         firstArray[firstNum + i] = secondArray[i];
     }
     return firstArray;
+}
+
+void printStringArray(char **stringArray, int numString) {
+
+    for (int i = 0; i < numString; i++) {
+        for (int j = 0; stringArray[i][j] != '\0'; j++) {
+            printf("%c", stringArray[i][j]);
+        }
+        printf("\n");
+    }
 }
 
 int main() {
@@ -509,6 +537,7 @@ int main() {
                 head1 = getCityListFromConsole();
                 printCityList(head1);
                 head1 = addIntervalCity(head1);
+                printf("ending\n");
                 printCityList(head1);
                 break;
             case 0:
