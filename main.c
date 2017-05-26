@@ -270,7 +270,9 @@ AUTHOR *GetAuth() {
     int Anum = 0, Bnum1 = 0, Bnum2;
     char **AuthArray = getArray(&Anum, 0);
     char **BookArray1 = NULL, **BookArray2 = NULL;
-    BookArray1 = getArray(&Bnum1, 1);
+    if (Anum > 0) {
+        BookArray1 = getArray(&Bnum1, 1);
+    }
     for (int i = 1; i < Anum; i++) {
         Bnum2 = 0;
         BookArray2 = getArray(&Bnum2, 1);
@@ -287,12 +289,20 @@ AUTHOR *AddBookFragment(AUTHOR *AElement) {
     char **BookFrag = getArray(&BookNum, 1); // Получаем массив книг, который впоследствии преобразуем в список для вставки.
     BOOK *BookHead = BooksListFromString(BookFrag, BookNum, &NumBook, &StrNum); //Формируем из массива книг список книг, который потом будем вставлять.
     BOOK *BookTail = BookHead;
+
     for (; BookTail->next != NULL; BookTail = BookTail->next); // Создаем указатель на конец списка книг.
     AElement->numbook += NumBook; // Увеличиваем количество книг в поле автора, поскольку мы добавляем какое-то количество.
     BOOK *tmp = AElement->books; // Заходим в список книг автора.
-    for (int i = 1; i < addNumber && tmp->next != NULL; i++, tmp = tmp->next); // Доходим до нужного по номеру элемента.
+
+    if (tmp != NULL) {
+        for (int i = 1; i < addNumber && tmp->next != NULL; i++, tmp = tmp->next); // Доходим до нужного по номеру элемента.
+    }
+
     if (addNumber == 0 || tmp == NULL) {
-        tmp = BookHead;
+        BookTail->next = AElement->books;
+        if (AElement->books != NULL)
+            AElement->books->prev = BookTail;
+        AElement->books = BookHead;
     } else if (tmp->next == NULL) {
         tmp->next = BookHead;
         BookHead->prev = tmp;
@@ -306,15 +316,23 @@ AUTHOR *AddBookFragment(AUTHOR *AElement) {
 }
 
 AUTHOR *AddAuthFragment(AUTHOR *Ahead) { // В данной функции все аналогично функции AddBookFragment
+
     printf("Enter the number of element after which you want to add another\n");
     int pos = -1, addNumber = getnum(&pos, getstr());
     AUTHOR *AFragHead = GetAuth();
     AUTHOR *AFragTail = AFragHead;
     for (; AFragTail->next != NULL; AFragTail = AFragTail->next);
     AUTHOR *tmp = Ahead;
-    for (int i = 1; i < addNumber && tmp->next != NULL; i++, tmp = tmp->next);
+
+    if (tmp != NULL) {
+        for (int i = 1; i < addNumber && tmp->next != NULL; i++, tmp = tmp->next);
+    }
+
     if (addNumber == 0 || tmp == NULL) {
-        tmp = AFragHead;
+        AFragTail->next = Ahead;
+        if (Ahead != NULL)
+            Ahead->prev = AFragTail;
+        Ahead = AFragHead;
     } else if (tmp->next == NULL) {
         tmp->next = AFragHead;
         AFragHead->prev = tmp;
@@ -325,6 +343,35 @@ AUTHOR *AddAuthFragment(AUTHOR *Ahead) { // В данной функции вс�
         tmp->next = AFragHead;
     }
     return Ahead;
+}
+
+AUTHOR *BookSortNum(AUTHOR *AElement) {
+    int counter = 0;
+    BOOK *tmp1 = AElement->books;
+    for (; tmp1 != NULL; tmp1 = tmp1->next) { // Пока не прошли список целиком...
+        if (tmp1->next != NULL) { // Если в списке не один элемент...
+            if (tmp1->next->year < tmp1->year) { // Сравниваем первый со вторым.
+                BOOK *tmp2 = tmp1->next; // Создаем второй.
+                tmp1->next = tmp2->next; // Если надо поменять их местами, меняем.
+                if (tmp2->next != NULL) {
+                    tmp2->next->prev = tmp1;
+                }
+                tmp2->prev = tmp1->prev;
+                tmp2->next = tmp1;
+                if (tmp1 == AElement->books) {
+                    AElement->books = tmp2;
+                } else {
+                    tmp1->prev->next = tmp2;
+                }
+                tmp1->prev = tmp2;
+                counter++; // Отмечаем тот факт, что мы поменяли их местами.
+            }
+            if (counter > 0) {
+                BookSortNum(AElement); // Рекурсивно вызываем функцию на повторную проверку, если мы меняли их местами.
+            }
+        }
+    }
+    return AElement;
 }
 
 void PrintBList (BOOK *Blist) {
@@ -340,7 +387,7 @@ void PrintBList (BOOK *Blist) {
 void PrintAList (AUTHOR *Alist) {
     if (Alist == NULL) printf("NO AUTHOR LIST!\n");
     else {
-        int i = 0;
+        int i = 1;
         for (AUTHOR *tmp = Alist; tmp != NULL; tmp = tmp->next, i++) {
             printf("[%d] AUTHOR:\t%s %s %d-%d %d\n", i, tmp->name, tmp->surname, tmp->birth, tmp->death, tmp->numbook);
             printf("BOOKS:\n");
@@ -362,7 +409,8 @@ int main()
     //Ahead = AddBookFragment(Ahead);
     //Ahead = DeleteAFrag(Ahead, 1, 2);
     //AddAuthorFragment(Ahead, Ahead, 2);
-    Ahead = AddAuthFragment(Ahead);
+    //Ahead = AddAuthFragment(Ahead);
+    Ahead = BookSortNum(Ahead);
     PrintAList(Ahead);
     return 0;
 }
