@@ -374,6 +374,17 @@ AUTHOR *BookSortNum(AUTHOR *AElement) {
     return AElement;
 }
 
+AUTHOR *AuthSortByBirthNum(AUTHOR *Ahead) {
+    int counter = 0;
+    AUTHOR *tmp1 = Ahead;
+    for (; tmp1 != NULL; tmp1 = tmp1->next) {
+        if (tmp1->next != NULL) {
+
+        }
+    }
+    return Ahead;
+}
+
 void PrintBList (BOOK *Blist) {
     if (Blist == NULL) printf("NO BOOKS!\n");
     else {
