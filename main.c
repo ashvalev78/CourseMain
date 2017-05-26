@@ -76,22 +76,24 @@ int getnum(int *j,char *str) {
     return num;
 }
 
-char *getString (char **str, int i, int j) {
+char *getString (char *str, int *i) {
     char *string = NULL;
-    for (int k = 0; str[i][j] != ' '; k++, j++) {
-        string = (char*)realloc(string, (k + 2) * sizeof(char));
-        string[k] = str[i][j];
-        string[k + 1] = '\0';
-    }
+    int k = -1;
+    (*i)--;
+    do {
+        k++;
+        (*i)++;
+        string = (char*)realloc(string, (k + 1) * sizeof(char));
+    } while ((string[k] = str[*i]) != ' ');
+    string[k] = '\0';
     return string;
 }
 
-BOOK *BooksListFromString(char **str, int num, int *quan) { // Функция для создания списка книг из полученного списка строк. Функция для последующей работы с файлами.
-    BOOK *nhead = NULL, *head = NULL, *tmp = head;
-    static int strnum = 0;
+BOOK *BooksListFromString(char **str, int num, int *quan, int *strnum) { // Функция для создания списка книг из полученного списка строк. Функция для последующей работы с файлами.
+    BOOK *nhead = NULL, *head = NULL, *tmp;
     int p = NULL;
     if (num == 0) return NULL;
-    for (int j = 0; strnum < num && str[strnum][j] != '*'; strnum++) {
+    for (int j = 0; *strnum < num && str[*strnum][0] != '*'; (*strnum)++) {
         j = 0;
         tmp = (BOOK*)malloc(sizeof(BOOK));
         if (p == NULL)
@@ -100,14 +102,10 @@ BOOK *BooksListFromString(char **str, int num, int *quan) { // Функция д
         tmp->prev = head;
         tmp->next = NULL;
         tmp->name = NULL;
-        for (int k = 0; str[strnum][j] != ' '; j++, k++) { // Здесь все функции построены по тому же принципу, что и в списке авторов.
-            tmp->name = (char*)realloc(tmp->name, (k + 2) * sizeof(char));
-            tmp->name[k] = str[strnum][j];
-            tmp->name[k + 1] = '\0';
-        }
+        tmp->name = getString(str[*strnum], &j);
         //printf("%s\n", tmp->name);
-        if (str[strnum][j] == ' ') {
-            tmp->year = getnum(&j, str[strnum]);
+        if (str[*strnum][j] == ' ') {
+            tmp->year = getnum(&j, str[*strnum]);
         }
         //printf("%d\n", tmp->year);
         head = tmp;
@@ -116,13 +114,14 @@ BOOK *BooksListFromString(char **str, int num, int *quan) { // Функция д
         tmp = tmp->next;
         (*quan)++;
     }
-    strnum++;
+    (*strnum)++;
     return nhead;
 } // quan - количество книг автора.
 
 AUTHOR *AuthListFromString(char **str, int num, char **BookMass, int Bnum) { // Функция создания списка авторов из полученного списка строк. Функция для работы с файлом.
     AUTHOR *nhead = NULL, *head = NULL, *tmp;
     printf("NUMBER IS %d\n", num);
+    int BookStrNum = 0;
     for (int i = 0; i < num; i++) {
         tmp = (AUTHOR*)malloc(sizeof(AUTHOR));
         if (i == 0)
@@ -133,22 +132,10 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass, int Bnum) { // 
         tmp->name = NULL;
         tmp->surname = NULL;
         for (int j = 0; str[i][j] != '\0'; j++) { // Функция получения имени автора, принцип понятен основан на простом считывании всех символов от начала стоки и до пробела.
-            tmp->name = getString(str, i, j);
-            /*
-            for (int k = 0; str[i][j] != ' '; k++, j++) {
-                tmp->name = (char*)realloc(tmp->name, (k + 2) * sizeof(char));
-                tmp->name[k] = str[i][j];
-                tmp->name[k + 1] = '\0';
-            }
-             */
-            //printf("%s\n", tmp->name);
+            tmp->name = getString(str[i], &j);
             if (str[i][j] == ' ') {
                 j++;
-                for (int k = 0; str[i][j] != ' '; k++, j++) { // Функция получения фамилии автора, принцип действия понятен,я думаю.
-                    tmp->surname = (char *) realloc(tmp->surname, (k + 2) * sizeof(char));
-                    tmp->surname[k] = str[i][j];
-                    tmp->surname[k + 1] = '\0';
-                }
+                tmp->surname = getString(str[i], &j);
             }
             //printf("%s\n", tmp->surname);
             if (str[i][j] == ' ') { // Функции такого рода надо будет впоследствии заменить на функцию getnum(). Собирает число из считываемых символов. Чтобы собрать число использует умножение на 10^k
@@ -174,7 +161,7 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass, int Bnum) { // 
             //printf("%d\n", tmp->numbook);
         }
         int quan = 0;
-        tmp->books = BooksListFromString(BookMass, Bnum, &quan);
+        tmp->books = BooksListFromString(BookMass, Bnum, &quan, &BookStrNum);
         if (quan != tmp->numbook) tmp->numbook = quan;
         head = tmp;
         if (head->prev != NULL)
@@ -251,6 +238,14 @@ AUTHOR *DeleteAFrag(AUTHOR *head, int num1, int num2) {
     return head;
 }
 
+char **SumArrays(char **FirstArray, char **SecondArray, int FirstNum, int SecondNum) {
+    for (int i = 0; i < SecondNum; i++) {
+        FirstArray = (char**)realloc(FirstArray, (FirstNum + i + 1) * sizeof(char*));
+        FirstArray[FirstNum + i] = SecondArray[i];
+    }
+    return FirstArray;
+}
+
 char **getArray(int *numString, int structure) {
     int pos = -1, i;
     char **stringArray = NULL;
@@ -264,24 +259,32 @@ char **getArray(int *numString, int structure) {
     }
     if (structure == 1) { // Если это массив книг, то нужна строка-разделитель.
         stringArray = (char**)realloc(stringArray, (i + 1) * sizeof(char*));
-        stringArray[i] = "***************************************************************************************\n";
+        stringArray[i] = "*\n";
+        (*numString)++;
     }
     return stringArray;
 }
 
 AUTHOR *GetAuth() {
     AUTHOR *Auth;
-    int Anum = 0, Bnum = 0;
+    int Anum = 0, Bnum1 = 0, Bnum2;
     char **AuthArray = getArray(&Anum, 0);
-    char **BookArray = getArray(&Bnum, 1);
-    Auth = AuthListFromString(AuthArray, Anum, BookArray, Bnum);
+    char **BookArray1 = NULL, **BookArray2 = NULL;
+    BookArray1 = getArray(&Bnum1, 1);
+    for (int i = 1; i < Anum; i++) {
+        Bnum2 = 0;
+        BookArray2 = getArray(&Bnum2, 1);
+        BookArray1 = SumArrays(BookArray1, BookArray2, Bnum1, Bnum2);
+        Bnum1 += Bnum2;
+    }
+    Auth = AuthListFromString(AuthArray, Anum, BookArray1, Bnum1);
     return Auth;
 }
 
 BOOK *AddBookElement (BOOK *head, BOOK *element, int addNumber) {
     if (head != NULL) {
         BOOK *tmp = head;
-        for (int i = 1; i <= addNumber; i++) {
+        for (int i = 1; i < addNumber; i++) {
             if (tmp->next == NULL) return head;
             tmp = tmp->next;
         }
@@ -313,7 +316,7 @@ BOOK *AddBookFragment(BOOK *head, BOOK *Frag, int addNumber) {
 AUTHOR *AddAuthElement(AUTHOR *head, AUTHOR *element, int addNumber) {
     if (head != NULL) {
         AUTHOR *tmp = head;
-        for (int i = 1; i <= addNumber; i++) {
+        for (int i = 1; i < addNumber; i++) {
             if (tmp->next == NULL) return head;
             tmp = tmp->next;
         }
@@ -337,13 +340,10 @@ AUTHOR *AddAuthElement(AUTHOR *head, AUTHOR *element, int addNumber) {
 AUTHOR *AddAuthorFragment(AUTHOR *head, AUTHOR *Frag, int addNumber) {
     int i = 0;
     for (AUTHOR *tmp = Frag; tmp != NULL; tmp = tmp->next, i++) {
+        tmp->next = NULL;
+        tmp->prev = NULL;
         head = AddAuthElement(head, tmp, addNumber + i);
     }
-    return head;
-}
-
-AUTHOR *AddElement(AUTHOR *head, int num) {
-    //if (head == NULL) head = getAuth();
     return head;
 }
 
@@ -368,14 +368,15 @@ void PrintAList (AUTHOR *Alist) {
 int main()
 {
     int Anum = 0, Bnum = 0;
-    //AUTHOR *Authors = GetAuth();
-    //PrintAList(Authors);
+    AUTHOR *Authors = GetAuth();
+    PrintAList(Authors);
     char **Auth = FGetABase(&Anum); // Получение массива авторов из файла
     char **Books = FGetABase(&Bnum);// Получение массива книг из файла
     AUTHOR *Ahead = AuthListFromString(Auth, Anum, Books, Bnum); // преобразование массивов авторов и книг в списки.
     PrintAList(Ahead);
     printf("******************************************************************************\n");
     //Ahead = DeleteAFrag(Ahead, 1, 2);
+    //AddAuthorFragment(Ahead, Ahead, 2);
     PrintAList(Ahead);
     return 0;
 }
