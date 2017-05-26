@@ -342,42 +342,77 @@ city *deleteIntervalCity(city *headCity, int setPosition1, int setPosition2) {
 
 }
 
-prospect *addProspNode(city *headCity, prospect *headProsp, const char* SET_VALUE) {
-
-    /*
-     * Функция добавляет элемент в начало, конец списка, либо после заданного номера в списке.
-     * Если список пуст - создает и добавляет в список первый элемент.
-     *
-
-    switch (SET_VALUE) {
-        case "END":
-
+prospect *addProsp(prospect *head, int addNumber, char *string) {
+    if (head != NULL) {
+        prospect *link = head;
+        for (int i = 1; i < addNumber; i++) {
+            if (link->next == NULL) return NULL;
+            link = link->next;
+        }
+        if (link->next == NULL) {
+            link->next = createProspNode(string);
+            link->next->prev = link;
+            link->next->next = NULL;
+        } else {
+            prospect *tmp = link -> next;
+            link -> next = createProspNode(string);
+            link -> next -> prev = link;
+            link = link -> next;
+            link -> next = tmp;
+            tmp -> prev = link;
+        }
+    } else {
+        head = createProspNode(string);
+        head -> next = NULL;
+        head -> prev = NULL;
     }
-
-
-    prospect *link = headProsp;
-    link = createProspNode(link);
-    link -> next = NULL;
-*/
-    return NULL;
-
+    return head;
 }
 
 int main() {
 
+    int input;
+    printf("");
+
+
+
+
+
     printf ("\nEnterpoint\n\n");
 
-    char **prospectStringBatya = NULL;
-    int numBatyaStringArr;
-    prospectStringBatya = getStrArray(&numBatyaStringArr);
-    printf("\nProsp: \n");
-    for (int i = 0; i < numBatyaStringArr; i++) {
-        for (int j = 0; prospectStringBatya[i][j] != '\0'; j++) {
-            printf("%c", prospectStringBatya[i][j]);
+    char **cityStringBase = NULL;
+    int numCityStringArr;
+    cityStringBase = getStrArray(&numCityStringArr);
+    printf("\nCity: \n");
+    for (int i = 0; i < numCityStringArr; i++) {
+        for (int j = 0; cityStringBase[i][j] != '\0'; j++) {
+            printf("%c", cityStringBase[i][j]);
         }
         printf("\n");
     }
+
+    char **prospectStringBase = NULL;
+    int numProspStringArr;
+    prospectStringBase = getStrArray(&numProspStringArr);
+    printf("\nProsp: \n");
+    for (int i = 0; i < numProspStringArr; i++) {
+        for (int j = 0; prospectStringBase[i][j] != '\0'; j++) {
+            printf("%c", prospectStringBase[i][j]);
+        }
+        printf("\n");
+    }
+
     printf("Endpoint5\n");
+
+    city *head = NULL;
+    head = createCity(cityStringBase, numCityStringArr, prospectStringBase);
+    printCityList(head);
+
+    printf("endpoint6\n");
+    printf("Enter the new node: ");
+    head ->prosp = addProsp(head -> prosp, 1, getStr());
+    printProspList(head -> prosp);
+
 
     int numStringCity = 0, numStringProsp = 0;
     char **stringArrayCity = NULL, **stringArrayProsp = NULL;
@@ -388,6 +423,32 @@ int main() {
 
     stringArrayCity = getStrArrayFromFile(&numStringCity);
     stringArrayProsp = getStrArrayFromFile(&numStringProsp);
+
+    city *mainHead = NULL;
+    mainHead = createCity(stringArrayCity, numStringCity, stringArrayProsp);
+
+    printCityList(mainHead);
+    //printCityListReverse(mainHead);
+
+    printf("Endpoint2\n");
+
+    int setPosition1 = 1, setPosition2 = 1;
+
+    mainHead = deleteIntervalCity(mainHead,setPosition1, setPosition2);
+
+    //проблемы: флоат 0 без точки = краш
+
+    printf("Endpoint3\n");
+    printCityList(mainHead);
+
+    printf("Endpoint4\n");
+    mainHead -> prosp = deleteProsp(mainHead, 1);
+    printCityList(mainHead);
+
+
+
+
+
 
     /*
     printf("\nCity: \n");
@@ -406,27 +467,6 @@ int main() {
         printf("\n");
     }
      */
-
-    city *mainHead = NULL;
-    mainHead = createCity(stringArrayCity, numStringCity, stringArrayProsp);
-
-    printCityList(mainHead);
-    //printCityListReverse(mainHead);
-
-    printf("Endpoint2\n");
-
-    int setPosition1 = 1, setPosition2 = 1;
-
-    mainHead = deleteIntervalCity(mainHead,setPosition1, setPosition2);
-    //printCityList(mainHead);
-    //проблемы: флоат 0 без точки = краш
-
-    printf("Endpoint3\n");
-    printCityList(mainHead);
-
-    printf("Endpoint4\n");
-    mainHead -> prosp = deleteProsp(mainHead, 1);
-    printCityList(mainHead);
 
     printf("ENDPOINT\n");
     return 0;
