@@ -280,7 +280,7 @@ AUTHOR *GetAuth() {
     Auth = AuthListFromString(AuthArray, Anum, BookArray1, Bnum1);
     return Auth;
 }
-
+/*
 BOOK *AddBookElement (BOOK *head, BOOK *element, int addNumber) {
     if (head != NULL) {
         BOOK *tmp = head;
@@ -312,7 +312,32 @@ BOOK *AddBookFragment(BOOK *head, BOOK *Frag, int addNumber) {
     }
     return head;
 }
+*/
 
+AUTHOR *AddBookFragment(AUTHOR *AElement, int num) {
+    printf("Enter the number of element after which you want to add another\n");
+    int pos = -1, NumBook = 0, StrNum = 0, BookNum = 0, addNumber = getnum(&pos, getstr());
+    char **BookFrag = getArray(&BookNum, 1); // Получаем массив книг, который впоследствии преобразуем в список для вставки.
+    BOOK *BookHead = BooksListFromString(BookFrag, BookNum, &NumBook, &StrNum); //Формируем из массива книг список книг, который потом будем вставлять.
+    BOOK *BookTale = BookHead;
+    for (; BookTale->next != NULL; BookTale = BookTale->next); // Создаем указатель на конец списка книг.
+    AElement->numbook += NumBook; // Увеличиваем количество книг в поле автора, поскольку мы добавляем какое-то количество.
+    BOOK *tmp = AElement->books; // Заходим в список книг автора.
+    for (int i = 1; i < addNumber; i++, tmp = tmp->next); // Доходим до нужного по номеру элемента.
+    if (addNumber == 0 || tmp == NULL) {
+        tmp = BookHead;
+    } else if (tmp->next == NULL) {
+        tmp->next = BookHead;
+        BookHead->prev = tmp;
+    } else {
+        BookTale->next = tmp->next;
+        tmp->next->prev = BookTale;
+        BookHead->prev = tmp;
+        tmp->next = BookHead;
+    }
+    return AElement;
+}
+/*
 AUTHOR *AddAuthElement(AUTHOR *head, AUTHOR *element, int addNumber) {
     if (head != NULL) {
         AUTHOR *tmp = head;
@@ -346,20 +371,24 @@ AUTHOR *AddAuthorFragment(AUTHOR *head, AUTHOR *Frag, int addNumber) {
     }
     return head;
 }
-
+*/
 void PrintBList (BOOK *Blist) {
     if (Blist == NULL) printf("NO BOOKS!\n");
     else {
-        for (BOOK *tmp = Blist; tmp != NULL; tmp = tmp->next)
-            printf("BOOK:\t%s %d\n", tmp->name, tmp->year);
+        int i = 1;
+        for (BOOK *tmp = Blist; tmp != NULL; tmp = tmp->next, i++) {
+            printf("\t[%d] BOOK:\t%s %d\n", i, tmp->name, tmp->year);
+        }
     }
 };
 
 void PrintAList (AUTHOR *Alist) {
     if (Alist == NULL) printf("NO AUTHOR LIST!\n");
     else {
-        for (AUTHOR *tmp = Alist; tmp != NULL; tmp = tmp->next) {
-            printf("AUTHOR:\t%s %s %d-%d %d\n", tmp->name, tmp->surname, tmp->birth, tmp->death, tmp->numbook);
+        int i = 0;
+        for (AUTHOR *tmp = Alist; tmp != NULL; tmp = tmp->next, i++) {
+            printf("[%d] AUTHOR:\t%s %s %d-%d %d\n", i, tmp->name, tmp->surname, tmp->birth, tmp->death, tmp->numbook);
+            printf("BOOKS:\n");
             PrintBList(tmp->books);
         }
     }
@@ -368,13 +397,14 @@ void PrintAList (AUTHOR *Alist) {
 int main()
 {
     int Anum = 0, Bnum = 0;
-    AUTHOR *Authors = GetAuth();
-    PrintAList(Authors);
+    //AUTHOR *Authors = GetAuth();
+    //PrintAList(Authors);
     char **Auth = FGetABase(&Anum); // Получение массива авторов из файла
     char **Books = FGetABase(&Bnum);// Получение массива книг из файла
     AUTHOR *Ahead = AuthListFromString(Auth, Anum, Books, Bnum); // преобразование массивов авторов и книг в списки.
     PrintAList(Ahead);
     printf("******************************************************************************\n");
+    Ahead = AddBookFragment(Ahead, 2);
     //Ahead = DeleteAFrag(Ahead, 1, 2);
     //AddAuthorFragment(Ahead, Ahead, 2);
     PrintAList(Ahead);
