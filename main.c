@@ -345,7 +345,7 @@ AUTHOR *AddAuthFragment(AUTHOR *Ahead) { // В данной функции вс�
     return Ahead;
 }
 
-AUTHOR *BookSortNum(AUTHOR *AElement) {
+AUTHOR *BookSortByNum(AUTHOR *AElement) {
     int counter = 0;
     BOOK *tmp1 = AElement->books;
     for (; tmp1 != NULL; tmp1 = tmp1->next) { // Пока не прошли список целиком...
@@ -367,19 +367,55 @@ AUTHOR *BookSortNum(AUTHOR *AElement) {
                 counter++; // Отмечаем тот факт, что мы поменяли их местами.
             }
             if (counter > 0) {
-                BookSortNum(AElement); // Рекурсивно вызываем функцию на повторную проверку, если мы меняли их местами.
+                AElement = BookSortByNum(AElement); // Рекурсивно вызываем функцию на повторную проверку, если мы меняли их местами.
             }
         }
     }
     return AElement;
 }
 
-AUTHOR *AuthSortByBirthNum(AUTHOR *Ahead) {
-    int counter = 0;
+AUTHOR *AuthSortByNum(AUTHOR *Ahead, char field) {
+    int counter = 0, AField1 = 0, AField2 = 0;
     AUTHOR *tmp1 = Ahead;
     for (; tmp1 != NULL; tmp1 = tmp1->next) {
         if (tmp1->next != NULL) {
-
+            switch (field) { // Выбор поля по передаваемому аргументу, чтобы не плодить большое количество одинаковых функций.
+                case '1':
+                    AField1 = tmp1->birth;
+                    AField2 = tmp1->next->birth;
+                    break;
+                case '2':
+                    AField1 = tmp1->death;
+                    AField2 = tmp1->next->death;
+                    break;
+                case '3':
+                    AField1 = tmp1->numbook;
+                    AField2 = tmp1->next->numbook;
+                    break;
+                default:
+                    printf("No field, please, enter it again\n");
+                    Ahead = AuthSortByNum(Ahead, getch());
+                    break;
+            }
+            if (AField2 < AField1) {
+                AUTHOR *tmp2 = tmp1->next;
+                tmp1->next = tmp2->next;
+                if (tmp2->next != NULL) {
+                    tmp2->next->prev = tmp1;
+                }
+                tmp2->prev = tmp1->prev;
+                tmp2->next = tmp1;
+                if (tmp1 == Ahead) {
+                    Ahead = tmp2;
+                } else {
+                    tmp1->prev->next = tmp2;
+                }
+                tmp1->prev = tmp2;
+                counter++; // Отмечаем тот факт, что мы поменяли их местами.
+            }
+            if (counter > 0) {
+                Ahead = AuthSortByNum(Ahead, field);
+            }
         }
     }
     return Ahead;
@@ -421,7 +457,7 @@ int main()
     //Ahead = DeleteAFrag(Ahead, 1, 2);
     //AddAuthorFragment(Ahead, Ahead, 2);
     //Ahead = AddAuthFragment(Ahead);
-    Ahead = BookSortNum(Ahead);
+    Ahead = AuthSortByNum(Ahead, 1);
     PrintAList(Ahead);
     return 0;
 }
