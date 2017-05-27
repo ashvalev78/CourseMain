@@ -490,6 +490,49 @@ city *getCityListFromConsole() {
     return head;
 }
 
+city *sortProspListNum(city *linkCity) {
+
+    prospect *link = linkCity -> prosp;
+    while (link -> next != NULL && link -> number <= link -> next -> number){
+        link = link -> next;
+    }
+    prospect *tmp;
+    link = link -> next;
+
+    while (link -> prev != NULL && link -> prev -> number > link -> number) {
+        tmp = link->prev;
+
+        if (link->next == NULL) {
+            link -> next = tmp;
+            link -> prev = tmp -> prev;
+            tmp -> prev = link;
+            tmp -> prev = NULL;
+        }
+        else if (tmp->prev == NULL) {
+                tmp->prev = link;
+                tmp->next = link->next;
+                link->next = tmp;
+                link->prev = NULL;
+                linkCity->prosp = link;
+            } else {
+                tmp->prev->next = link;
+                link->prev = tmp->prev;
+                tmp->prev = link;
+                tmp->next = link->next;
+                link->next = tmp;
+
+        }
+    }
+    if (link -> next != NULL) {
+        printProspList(linkCity -> prosp);
+        sortProspListNum(linkCity);
+    } else {
+        return linkCity;
+    }
+
+    //return linkCity;
+}
+
 char **sumArrays(char **firstArray, char **secondArray, int firstNum, int secondNum) {
     for (int i = 0; i < secondNum; i++) {
         firstArray = (char **) realloc(firstArray, (firstNum + i + 1) * sizeof(char *));
@@ -539,6 +582,15 @@ int main() {
                 head1 = addIntervalCity(head1);
                 printf("ending\n");
                 printCityList(head1);
+                break;
+            case 3:
+                printf("Pressed 3\n");
+                city *head2 = NULL;
+                head2 = getCityListFromConsole();
+                printCityList(head2);
+
+                head2 = sortProspListNum(head2);
+                printProspList(head2 -> prosp);
                 break;
             case 0:
                 printf("Pressed 0. Finish the program\n");
