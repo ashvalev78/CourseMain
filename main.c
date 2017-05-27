@@ -2,6 +2,7 @@
 #include <malloc.h>
 #include <conio.h>
 #include <math.h>
+#include <string.h>
 
 typedef struct BOOK {
     char *name;
@@ -345,8 +346,21 @@ AUTHOR *AddAuthFragment(AUTHOR *Ahead) { // В данной функции вс�
     return Ahead;
 }
 
+int CheckStrings(char *str1, char *str2) {
+    printf("%s\t%s\n", str1, str2);
+    for (int i = 0; str1[i] != '\0' && str2[i] != '\0'; i++) {
+        if (str1[i] < str2[i]) {
+            return 0;
+        } else if (str1[i] > str2[i]) {
+            return 1;
+        }
+    }
+    if (strlen(str1) > strlen(str2))
+        return 1;
+    return 0;
+}
+
 AUTHOR *BookSortByNum(AUTHOR *AElement) {
-    int counter = 0;
     BOOK *tmp1 = AElement->books;
     for (; tmp1 != NULL; tmp1 = tmp1->next) { // Пока не прошли список целиком...
         if (tmp1->next != NULL) { // Если в списке не один элемент...
@@ -364,9 +378,6 @@ AUTHOR *BookSortByNum(AUTHOR *AElement) {
                     tmp1->prev->next = tmp2;
                 }
                 tmp1->prev = tmp2;
-                counter++; // Отмечаем тот факт, что мы поменяли их местами.
-            }
-            if (counter > 0) {
                 AElement = BookSortByNum(AElement); // Рекурсивно вызываем функцию на повторную проверку, если мы меняли их местами.
             }
         }
@@ -375,7 +386,7 @@ AUTHOR *BookSortByNum(AUTHOR *AElement) {
 }
 
 AUTHOR *AuthSortByNum(AUTHOR *Ahead, char field) {
-    int counter = 0, AField1 = 0, AField2 = 0;
+    int AField1 = 0, AField2 = 0;
     AUTHOR *tmp1 = Ahead;
     for (; tmp1 != NULL; tmp1 = tmp1->next) {
         if (tmp1->next != NULL) {
@@ -411,10 +422,47 @@ AUTHOR *AuthSortByNum(AUTHOR *Ahead, char field) {
                     tmp1->prev->next = tmp2;
                 }
                 tmp1->prev = tmp2;
-                counter++; // Отмечаем тот факт, что мы поменяли их местами.
+                Ahead = AuthSortByNum(Ahead, field); // Рекурсивно вызываем функцию на повторную проверку, если мы меняли их местами.
             }
-            if (counter > 0) {
-                Ahead = AuthSortByNum(Ahead, field);
+        }
+    }
+    return Ahead;
+}
+
+AUTHOR *AuthSortByAlphabet(AUTHOR *Ahead, char field) {
+    char *Field1, *Field2;
+    AUTHOR *tmp1 = Ahead;
+    for (; tmp1 != NULL; tmp1 = tmp1->next) {
+        if (tmp1->next != NULL) {
+            switch (field) { // Выбор поля по передаваемому аргументу, чтобы не плодить большое количество одинаковых функций.
+                case '1':
+                    Field1 = tmp1->name;
+                    Field2 = tmp1->next->name;
+                    break;
+                case '2':
+                    Field1 = tmp1->surname;
+                    Field2 = tmp1->next->surname;
+                    break;
+                default:
+                    printf("No field, please, enter it again\n");
+                    Ahead = AuthSortByAlphabet(Ahead, getch());
+                    break;
+            }
+            if (CheckStrings(Field1, Field2) > 0) {
+                AUTHOR *tmp2 = tmp1->next;
+                tmp1->next = tmp2->next;
+                if (tmp2->next != NULL) {
+                    tmp2->next->prev = tmp1;
+                }
+                tmp2->prev = tmp1->prev;
+                tmp2->next = tmp1;
+                if (tmp1 == Ahead) {
+                    Ahead = tmp2;
+                } else {
+                    tmp1->prev->next = tmp2;
+                }
+                tmp1->prev = tmp2;
+                Ahead = AuthSortByAlphabet(Ahead, field); // Рекурсивно вызываем функцию на повторную проверку, если мы меняли их местами.
             }
         }
     }
@@ -457,7 +505,7 @@ int main()
     //Ahead = DeleteAFrag(Ahead, 1, 2);
     //AddAuthorFragment(Ahead, Ahead, 2);
     //Ahead = AddAuthFragment(Ahead);
-    Ahead = AuthSortByNum(Ahead, 1);
+    Ahead = AuthSortByAlphabet(Ahead, '1');
     PrintAList(Ahead);
     return 0;
 }
