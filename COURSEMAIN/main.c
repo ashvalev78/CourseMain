@@ -489,48 +489,110 @@ city *getCityListFromConsole() {
     }
     return head;
 }
+/*
+city *sortProspList(city *linkCity) {
 
-city *sortProspListNum(city *linkCity) {
+    prospect *link = linkCity->prosp;
+    for (; link->next != NULL && link->next->number > link->number; link = link->next);
 
-    prospect *link = linkCity -> prosp;
-    while (link -> next != NULL && link -> number <= link -> next -> number){
-        link = link -> next;
-    }
     prospect *tmp;
-    link = link -> next;
+    if (link->next != NULL) {
+        link = link->next;
+    }
 
-    while (link -> prev != NULL && link -> prev -> number > link -> number) {
-        tmp = link->prev;
+    for (; link->prev != NULL; link = link->prev) {
+        if (link->prev->number > link->number) {
 
-        if (link->next == NULL) {
-            link -> next = tmp;
-            link -> prev = tmp -> prev;
-            tmp -> prev = link;
-            tmp -> prev = NULL;
         }
-        else if (tmp->prev == NULL) {
-                tmp->prev = link;
-                tmp->next = link->next;
-                link->next = tmp;
-                link->prev = NULL;
-                linkCity->prosp = link;
-            } else {
-                tmp->prev->next = link;
+    }
+
+
+}*/
+city *sortProspListNum(city *linkCity) {
+    int counter = 0;
+    prospect *tmp = linkCity->prosp;
+    for (; tmp != NULL; tmp = tmp->next) { // Пока не прошли список целиком...
+        if (tmp->next != NULL) { // Если в списке не один элемент...
+            if (tmp->next->number < tmp->number) { // Сравниваем первый со вторым.
+                prospect *link = tmp->next; // Создаем второй.
+                tmp->next = link->next; // Если надо поменять их местами, меняем.
+                if (link->next != NULL) {
+                    link->next->prev = tmp;
+                }
                 link->prev = tmp->prev;
-                tmp->prev = link;
-                tmp->next = link->next;
                 link->next = tmp;
-
+                if (tmp == linkCity->prosp) {
+                    linkCity -> prosp = link;
+                } else {
+                    tmp->prev->next = link;
+                }
+                tmp->prev = link;
+                counter++; // Отмечаем тот факт, что мы поменяли их местами.
+            }
+            if (counter > 0) {
+                linkCity = sortProspListNum(linkCity); // Рекурсивно вызываем функцию на повторную проверку, если мы меняли их местами.
+            }
         }
     }
-    if (link -> next != NULL) {
-        printProspList(linkCity -> prosp);
-        sortProspListNum(linkCity);
-    } else {
-        return linkCity;
+    return linkCity;
+}
+
+city *sortCityListNum(city *headCity, int input) {
+    int field1 = 0, field2 = 0;
+    int SET_POSITION = -1;
+    city *link = headCity;
+    for (; link != NULL; link = link->next) {
+        if (link->next != NULL) {
+            switch (input) {
+                case 1:
+                    field1 = link->foundation;
+                    field2 = link->next->foundation;
+                    break;
+                case 2:
+                    field1 = link->prospNumber;
+                    field2 = link->next->prospNumber;
+                    break;
+                default:
+                    ("No field to sort. Enter the field: \n");
+                    input = getIntFromString(getStr(), &SET_POSITION);
+                    break;
+            }
+            if (field2 < field1) {
+                city *tmp = link->next;
+                link->next = tmp->next;
+                if (tmp->next != NULL) {
+                    tmp->next->prev = tmp;
+                }
+                tmp->prev = link->prev;
+                tmp->next = link;
+                if (link == headCity) {
+                    headCity = tmp;
+                } else {
+                    link->prev->next = tmp;
+                }
+                link->prev = tmp;
+                headCity = sortCityListNum(headCity, input); // Отмечаем тот факт, что мы поменяли их местами.
+            }
+        }
     }
 
-    //return linkCity;
+    return headCity;
+}
+
+int compareStrings(char *string1, char *string2) {
+    int i;
+    for (i = 0; string1[i] != '\0' || string2[i] != '\0'; i++) {
+        if (string1[i] > string2[i]) return 2;
+        else if (string1[i] < string2[i]) return  1;
+    }
+
+    if (string1[i] != '\0') {
+        if (string2[i] == '\0')
+            return 2;
+        else return 0;
+    } else if (string2[i] != '\0')
+        return 1;
+    else return 0;
 }
 
 char **sumArrays(char **firstArray, char **secondArray, int firstNum, int secondNum) {
@@ -553,6 +615,7 @@ void printStringArray(char **stringArray, int numString) {
 
 int main() {
 
+    char *string1 = "all", *string2 = "all";
 
     int input = 1;
     printf("Hello! It's enterpoint of the program. Choose one point from the menu below\n\n"
@@ -589,8 +652,14 @@ int main() {
                 head2 = getCityListFromConsole();
                 printCityList(head2);
 
-                head2 = sortProspListNum(head2);
-                printProspList(head2 -> prosp);
+                printf("wqgfwf\n");
+                head2 = sortCityListNum(head2, 1);
+                printCityList(head2);
+
+                break;
+            case 4:
+                printf("%d\n", compareStrings(string1, string2));
+
                 break;
             case 0:
                 printf("Pressed 0. Finish the program\n");
