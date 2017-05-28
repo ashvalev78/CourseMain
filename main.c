@@ -69,7 +69,7 @@ int getnum (int *j,char *str) {
     p = 3;
     num = (str[*j] - '0') * (int)pow(10, p);
     (*j)++;
-    for (p = 2; str[*j] != ' ' && str[*j] != '\0'; p--, (*j)++) {
+    for (p = 2; str[*j] != ' ' && str[*j] != '\0' && str[*j] != '\r'; p--, (*j)++) {
         num = num + (str[*j] - '0') * (int)pow(10,p);
     }
     if (p >= 0)
@@ -494,8 +494,10 @@ AUTHOR *AuthSortByAlphabet (AUTHOR *Ahead, char field) {
 void PrintAuthIntoTheFile (AUTHOR *Ahead) {
     printf("WARNING! If something will go wrong, your data may be lost!\n"
                    "You can make another file if you want\n"
-                   "Enter the way to the new file\n");
+                   "Enter the way to the authors file\n");
     FILE *newBase = fopen(getstr(), "w");
+    printf("Enter the way to the books file\n");
+    FILE *BooksBase = fopen(getstr(), "w");
     for (AUTHOR *tmp = Ahead; tmp != NULL; tmp = tmp->next) {
         for (int i = 0; tmp->name[i] != '\0'; i++) {
             fputc(tmp->name[i], newBase);
@@ -506,26 +508,16 @@ void PrintAuthIntoTheFile (AUTHOR *Ahead) {
         }
         fputc(' ', newBase);
         fprintf(newBase, "%d %d %d\r\n", tmp->birth, tmp->death, tmp->numbook);
-    }
-    fclose(newBase);
-}
-
-void PrintBookIntoTheFile (AUTHOR *Ahead) {
-    printf("WARNING! If something will go wrong, your data may be lost!\n"
-                   "You can make another file if you want\n"
-                   "Enter the way to the new file\n");
-    FILE *newBase = fopen(getstr(), "w");
-    for (AUTHOR *tmp = Ahead; tmp != NULL; tmp = tmp->next) {
-        for (int i = 0; tmp->name[i] != '\0'; i++) {
-            fputc(tmp->name[i], newBase);
+        for (BOOK *btmp = tmp->books; btmp != NULL; btmp = btmp->next) {
+            for (int i = 0; btmp->name[i] != '\0'; i++) {
+                fputc(btmp->name[i], BooksBase);
+            }
+            fputc(' ', BooksBase);
+            fprintf(BooksBase, "%d\r\n\0", btmp->year);
         }
-        fputc(' ', newBase);
-        for (int i = 0; tmp->surname[i] != '\0'; i++) {
-            fputc(tmp->surname[i], newBase);
-        }
-        fputc(' ', newBase);
-        fprintf(newBase, "%d %d %d\r\n", tmp->birth, tmp->death, tmp->numbook);
+        fputs("******\r\n", BooksBase);
     }
+    fclose(BooksBase);
     fclose(newBase);
 }
 
@@ -534,32 +526,78 @@ void PrintBList (BOOK *Blist) {
     else {
         int i = 1;
         for (BOOK *tmp = Blist; tmp != NULL; tmp = tmp->next, i++) {
-            printf("\t[%d] BOOK:\t%s %d\n", i, tmp->name, tmp->year);
+            printf("\t[%d] BOOK:\t%s Date: %d\n", i, tmp->name, tmp->year);
         }
     }
-};
+}
 
 void PrintAList (AUTHOR *Alist) {
     if (Alist == NULL) printf("NO AUTHOR LIST!\n");
     else {
         int i = 1;
         for (AUTHOR *tmp = Alist; tmp != NULL; tmp = tmp->next, i++) {
-            printf("[%d] AUTHOR:\t%s %s %d-%d %d\n", i, tmp->name, tmp->surname, tmp->birth, tmp->death, tmp->numbook);
+            printf("[%d] AUTHOR:\t%s %s Years: %d-%d Number of books: %d\n", i, tmp->name, tmp->surname, tmp->birth, tmp->death, tmp->numbook);
             printf("BOOKS:\n");
             PrintBList(tmp->books);
         }
     }
-};
+}
+
+void menu () {
+    printf("\tMENU\n"
+                   "\tAuthor string format: Name Surname Birth Death (Number of books)\n"
+                   "\tBook string format: Name_of_the_book Year\n"
+                   "\tPress 0 to escape the program\n"
+                   "\tPress 1 to see menu again\n"
+                   "\tPress 2 to enter your lists from the file\n"
+                   "\tPress 3 to enter your own lists by keyboard\n"
+                   "\tPress 4 to add some elements into the lists\n"
+                   "\tPress 5 to delete some elements from your lists\n"
+                   "\tPress 6 to sort your lists\n"
+                   "\tPress 7 to save your changes\n ");
+}
 
 int main()
 {
     int Anum = 0, Bnum = 0;
-    //AUTHOR *Authors = GetAuth();
-    //PrintAList(Authors);
-    char **Auth = FGetABase(&Anum); // Получение массива авторов из файла
-    char **Books = FGetABase(&Bnum);// Получение массива книг из файла
-    AUTHOR *Ahead = AuthListFromString(Auth, Anum, Books, Bnum); // преобразование массивов авторов и книг в списки.
-    PrintAList(Ahead);
+    char **Auth, **Books;
+    char input1, input2;
+    AUTHOR *Ahead = NULL;
+    menu ();
+    while ((input1 = getch()) != '0') {
+        switch (input1) {
+            case '1' :
+                menu();
+                break;
+            case '2' :
+                Auth = FGetABase(&Anum); // Получение массива авторов из файла.
+                Books = FGetABase(&Bnum);// Получение массива книг из файла.
+                Ahead = AuthListFromString(Auth, Anum, Books, Bnum); // преобразование массивов авторов и книг в списки.
+                PrintAList(Ahead);
+                break;
+            case '3' :
+                Ahead = GetAuth();
+                PrintAList(Ahead);
+                break;
+            case '4' :
+                printf("Press 1 to add elements into the authors list\n"
+                               "Press 2 to add elements into the someones books list\n ");
+                while ((input2 = getch()) != '0') {
+                    switch (input2) {
+                        case '1' :
+
+                            break;
+                        default :
+                            printf("You've chosen the wrong number, try again\n");
+                            break;
+                    }
+                }
+                break;
+            default :
+                printf("Please, eneter another number\n");
+                break;
+        }
+    }
     printf("******************************[NEW AUTHOR LIST]********************************\n");
     //Ahead = AddBookFragment(Ahead);
     //Ahead = DeleteAFrag(Ahead, 1, 2);
