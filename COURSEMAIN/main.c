@@ -22,12 +22,39 @@ typedef struct city {
 } city;
 
 char **sumArrays(char **firstArray, char** secondArray, int firstNum, int SecondNum);
+city *getCityListFromConsole();
+void printStringArray(char **stringArray, int numString);
+int compareStrings(char *string1, char *string2);
 
+void freeArray(char** array, int size);
+void freeProspList(prospect *head);
+void freeCityList(city *head);
+
+char *getStr ();
+
+void printProspList(prospect *head);
+void printProspListReverse(prospect *head);
+void printCityList(city *head);
+void printCityListReverse(city *head);
+
+int getIntFromBeginString(char *string);
+unsigned int getIntFromString(char *string, int *firstPosition);
+float getFloatFromString(char *string, int *numPosition);
+char *getSubstringFromString(char *string, int *numPosition);
+
+prospect *createProspNode(char *string);
+prospect *createProsp(char **baseString, int numString, int *countProsp);
+city *createCityNode(char *string, char **baseProspString, int *countProsp);
+city *createCity(char **baseString, int numString, char **baseProspString);
+
+char **getStrArray(int *numString, int prosp);
+char **getStrArrayFromFile (int *numString);
 city *getCityListFromConsole();
 
-void printStringArray(char **stringArray, int numString);
+prospect *deleteProsp(city *linkCity, int delNumber);
 
-int compareStrings(char *string1, char *string2);
+
+
 
 void memoryCheck(void *pointer)
 {
@@ -37,8 +64,7 @@ void memoryCheck(void *pointer)
         exit(1);
     }
 }
-
-
+/*
 void freeCityList(city *head)
 {
     if (head != NULL) {
@@ -54,14 +80,51 @@ void freeCityList(city *head)
     }
     free(head);
 }
+*/
 
-/*
- * Функция посимвольно считывает строку до символа ‘\n’.
- * Функция возвращает считанную строку newStr.
- */
+void freeArray(char** array, int size) {
+    if (array != NULL) {
+        for (int i = 0; i < size; i++) {
+            free(array[i]);
+        }
+        free(array);
+    }
+}
 
-char *getStr ()
-{
+void freeProspList(prospect *head) {
+    if (head != NULL) {
+        prospect *link = head;
+        while (link -> next != NULL) {
+            link = link -> next;
+            free(link -> prev -> name);
+            free(link -> prev);
+        }
+        free(link -> name);
+        free(link);
+    }
+}
+
+void freeCityList(city *head) {
+    if (head != NULL) {
+        city *link = head;
+        while (link -> next != NULL) {
+            link = link -> next;
+            free(link -> prev -> name);
+            freeProspList(link -> prev -> prosp);
+            free(link -> prev);
+        }
+        free(link -> name);
+        freeProspList(link -> prosp);
+        free(link);
+    }
+}
+
+char *getStr () {
+    /*
+    *  Функция посимвольно считывает строку до символа ‘\n’.
+    *  Функция возвращает считанную строку newStr.
+    */
+
     char *newStr = NULL;
     int i = -1;
     do
@@ -103,11 +166,11 @@ void printProspListReverse(prospect *head) {
     }
 }
 
-/*
- * В функцию передается указатель на первый элемент списка head.
-	Функция выводит на экран содержимое информационного поля всех элементов списка.
- */
 void printCityList(city *head) {
+    /*
+    *   В функцию передается указатель на первый элемент списка head.
+	*   Функция выводит на экран содержимое информационного поля всех элементов списка.
+    */
     if (head != NULL) {
         city *link = head;
         for (int i = 1; link != NULL; i++, link = link->next) {
@@ -122,12 +185,12 @@ void printCityList(city *head) {
     }
 }
 
-
-/*
- * В функцию передается указатель на первый элемент списка head.
-	Функция выводит на экран содержимое информационного поля всех элементов списка в обратном порядке.
- */
 void printCityListReverse(city *head) {
+    /*
+    *   В функцию передается указатель на первый элемент списка head.
+	*   Функция выводит на экран содержимое информационного поля всех элементов списка в обратном порядке.
+    */
+
     if (head != NULL)
     {
         city *link = head;
@@ -137,6 +200,7 @@ void printCityListReverse(city *head) {
         {
             printf("Node #%d\nName - [%s]\nFoundDate - [%u]\nPopulation - [%f]\nNumberOfProspects - [%u]\n",
                    i--, link->name, link->foundation, link->population, link->prospNumber);
+            printProspList(link -> prosp);
             link = link -> prev;
         } while(link != NULL);
         puts("The beginning of the list\n");
@@ -144,49 +208,6 @@ void printCityListReverse(city *head) {
         printf("Your list is empty\n");
     }
 }
-
-/*
-prospect *reverseNodes(prospect *head, int position1, int position2) {
-    if (head != NULL && head -> next != NULL) {
-        prospect *link = head;
-        for (int i = 1; i < position1 && link->next != NULL; link = link->next, i++);
-
-        if (link->next == NULL) {
-            printf("NOOOOO\n");
-            return head;
-        }
-        prospect *tmp = link;
-
-        for (int i = position1; i < position2 && link -> next != NULL; link = link->next, i++);
-        if (tmp -> prev != NULL) {
-            printf("YEAH1\n");
-            if (link -> next != NULL) {
-                printf("YEAH2\n");
-                if (tmp -> next != link) {
-
-                    printf("YEAH3\n");
-                    link -> prev -> next = tmp;
-                    link -> next -> prev = tmp;
-                    tmp -> prev -> next = link;
-                    tmp -> next -> prev = link;
-                    prospect *link_old = link;
-                    link -> prev = tmp -> prev;
-                    link -> next = tmp -> next;
-                    tmp -> prev = link_old -> prev;
-                    tmp -> next = link_old -> next;
-
-                }
-
-            }
-        }
-
-    } else {
-        printf("Your list is empty or consists of one node\n");
-    }
-    return head;
-}
-*/
-
 
 int getIntFromBeginString(char *string) {
     unsigned int N = 0;
@@ -215,8 +236,6 @@ unsigned int getIntFromString(char *string, int *firstPosition) {
     unsigned int N = 0;
     int *j = firstPosition, elderPositionU;
     for (elderPositionU = 0; string[++*j] != ' ' && string[*j] != '\0' && string[*j] != '.' && string[*j] != '\n'; elderPositionU++);
-    printf("eldpod = [%d]", elderPositionU);
-
 
     int k;
     for (k = elderPositionU; k > 1; k--) {
@@ -263,6 +282,7 @@ char *getSubstringFromString(char *string, int *numPosition) {
     do {
         (*numPosition)++;
         substring = (char *) realloc(substring, (*numPosition + 1) * sizeof(char));
+        memoryCheck(substring);
     } while ((substring[*numPosition] = string[*numPosition]) != ' ' && substring[*numPosition] != '\n');
     substring[*numPosition] = '\0';
     return substring;
@@ -270,11 +290,11 @@ char *getSubstringFromString(char *string, int *numPosition) {
 
 prospect *createProspNode(char *string) {
 
-
-
+    //ограниченное кол-о проспнодов
     prospect *link = NULL;
     if (string[0] != '\0') {
         link = (prospect *) malloc(sizeof(prospect));
+        memoryCheck(link);
         int j = -1;
         link -> name = getSubstringFromString(string, &j);
         link -> number = getIntFromString(string, &j);
@@ -304,6 +324,7 @@ city *createCityNode(char *string, char **baseProspString, int *countProsp) {
     city *link = NULL;
     if (string[0] != '\0') {
         link = (city *) malloc(sizeof(city));
+        memoryCheck(link);
         int j = -1;
         link->name = getSubstringFromString(string, &j);
         link -> foundation = getIntFromString(string, &j);
@@ -330,18 +351,19 @@ city *createCity(char **baseString, int numString, char **baseProspString) {
 }
 
 char **getStrArray(int *numString, int prosp) {
-    int SET_POSITION = -1;
     char **stringArray = NULL;
-    printf("Enter number of nodes: ");
-    *numString = getIntFromString(getStr(), &SET_POSITION);
+    *numString = getIntFromBeginString(getStr());
+    puts("Enter strings to form the list");
     int i;
     for (i = 0; i < *numString; i++) {
         stringArray = (char **) realloc(stringArray, (i + 1) * sizeof(char *));
+        memoryCheck(stringArray);
         stringArray[i] = NULL;
         stringArray[i] = getStr();
     }
     if (prosp) {
         stringArray = (char**)realloc(stringArray, (i + 1) * sizeof(char*));
+        memoryCheck(stringArray);
         stringArray[i] = "~\n";
         (*numString)++;
     }
@@ -365,6 +387,7 @@ char **getStrArrayFromFile (int *numString) {
             int i;
             for (i = 0; !feof(dataFile); i++) {
                 stringArray = (char **) realloc(stringArray, (i + 1) * sizeof(char *));
+                memoryCheck(stringArray);
                 stringArray[i] = NULL;
                 int j = -1;
                 do {
@@ -379,6 +402,33 @@ char **getStrArrayFromFile (int *numString) {
             return stringArray;
         }
     }
+}
+
+//????????????????????
+city *getCityListFromConsole() {
+    city *head = NULL;
+    int cityNum = 0, prospNum1 = 0, prospNum2 = 0;
+    char **cityStringArray = NULL, **prospStringArray1 = NULL, **prospStringArray2 = NULL;
+    printf("Enter number of cities: ");
+    cityStringArray = getStrArray(&cityNum, 0);
+    if (cityNum != 0) {
+        printf("Enter number of prospects in the city #1: ");
+        prospStringArray1 = getStrArray(&prospNum1, 1);
+        for (int i = 1; i < cityNum; i++) {
+            prospNum2 = 0;
+            printf("Enter number of prospects in the city #%i: ", i + 1);
+            prospStringArray2 = getStrArray(&prospNum2, 1);
+            prospStringArray1 = sumArrays(prospStringArray1, prospStringArray2, prospNum1, prospNum2);
+            prospNum1 += prospNum2;
+        }
+        head = createCity(cityStringArray, cityNum, prospStringArray1);
+    }
+    //нужно ли освобождать??
+    freeArray(cityStringArray, cityNum);
+    freeArray(prospStringArray1, prospNum1);
+    freeArray(prospStringArray2, prospNum2);
+
+    return head;
 }
 
 prospect *deleteProsp(city *linkCity, int delNumber) {
@@ -409,13 +459,19 @@ prospect *deleteProsp(city *linkCity, int delNumber) {
     return headProsp;
 }
 
-prospect *deleteIntervalProsp(city* linkCity, int setPosition1, int setPosition2) {
+city *deleteIntervalProsp(city* linkCity) {
+
+    printf("Enter the 1st position: ");
+    int setPosition1 = getIntFromBeginString(getStr());
+
+    printf("Enter the 2st position: ");
+    int setPosition2 = getIntFromBeginString(getStr());
 
     for (int i = setPosition1; i <= setPosition2; i++) {
         linkCity -> prosp = deleteProsp(linkCity, setPosition1);
         printProspList(linkCity -> prosp);
     }
-    return linkCity -> prosp;
+    return linkCity;
 }
 
 city *deleteCity(city *headCity, int delNumber) {
@@ -438,14 +494,22 @@ city *deleteCity(city *headCity, int delNumber) {
             link->prev->next = link->next;
             link->next->prev = link->prev;
         }
-        link -> prosp = deleteIntervalProsp(link, 1, link -> prospNumber);
+        //link = deleteIntervalProsp(link);
+        //free(link -> prosp);
+        freeProspList(headCity -> prosp);
         free(link->name);
         free(link);
     }
     return headCity;
 }
 
-city *deleteIntervalCity(city *headCity, int setPosition1, int setPosition2) {
+city *deleteIntervalCity(city *headCity) {
+
+    printf("Enter the 1st position: ");
+    int setPosition1 = getIntFromBeginString(getStr());
+
+    printf("Enter the 2st position: ");
+    int setPosition2 = getIntFromBeginString(getStr());
 
     for (int i = setPosition1; i <= setPosition2; i++) {
         headCity = deleteCity(headCity, setPosition1);
@@ -456,41 +520,47 @@ city *deleteIntervalCity(city *headCity, int setPosition1, int setPosition2) {
 }
 
 city *addIntervalProsp(city *linkCity) {
-    //numAddNodes - кол-во проспектов, которые добавятся в список, positiontoAdd - позиция, после которой будет всталвен элемент
-    printf("Enter the position of node after which nodes will be added: ");
-    int numberAddNodes, SET_POSITION_1 = -1, SET_POSITION_2 = 0, positionToAdd = getIntFromString(getStr(), &SET_POSITION_1);
-    prospect *subHead = createProsp(getStrArray(&numberAddNodes, 0), numberAddNodes, &SET_POSITION_2);
-    printProspList(subHead);
+    if (linkCity != NULL) {
+        //numAddNodes - кол-во проспектов, которые добавятся в список, positiontoAdd - позиция, после которой будет всталвен элемент
+        printf("Enter the position of node after which nodes will be added: ");
+        int numberAddNodes, SET_POSITION = 0, positionToAdd = getIntFromBeginString(getStr());
+        printf("Enter the number of nodes that will be added to the prospect list: ");
+        prospect *subHead = createProsp(getStrArray(&numberAddNodes, 0), numberAddNodes, &SET_POSITION);
+        //printProspList(subHead);
 
-    prospect *subTail;
-    for (subTail = subHead; subTail -> next != NULL; subTail = subTail -> next);
-    prospect *link = linkCity -> prosp;
+        prospect *subTail;
+        for (subTail = subHead; subTail->next != NULL; subTail = subTail->next);
+        prospect *link = linkCity->prosp;
 
-    if (link != NULL) {
-        for (int i = 1; i < positionToAdd && link->next != NULL; link = link->next, i++);
-    }
-
-    if (positionToAdd == 0 || link == NULL) {
-        subTail -> next = linkCity -> prosp;
-        if (linkCity -> prosp != NULL) {
-            linkCity -> prosp -> prev = subTail;
+        if (link != NULL) {
+            for (int i = 1; i < positionToAdd && link->next != NULL; link = link->next, i++);
         }
-        linkCity -> prosp = subHead;
-    } else if (link -> next == NULL) {
-        link -> next = subHead;
-        subHead -> prev = link;
+
+        if (positionToAdd == 0 || link == NULL) {
+            subTail->next = linkCity->prosp;
+            if (linkCity->prosp != NULL) {
+                linkCity->prosp->prev = subTail;
+            }
+            linkCity->prosp = subHead;
+        } else if (link->next == NULL) {
+            link->next = subHead;
+            subHead->prev = link;
+        } else {
+            subTail->next = link->next;
+            link->next->prev = subTail;
+            subHead->prev = link;
+            link->next = subHead;
+        }
+        (linkCity -> prospNumber) += numberAddNodes;
     } else {
-        subTail -> next = link -> next;
-        link -> next -> prev = subTail;
-        subHead -> prev = link;
-        link -> next = subHead;
+        puts("Cannot add prospects to the empty city list");
     }
     return linkCity;
 }
 
 city *addIntervalCity(city *headCity) {
     printf("Enter the position of node after which nodes will be added: ");
-    int SET_POSITION_1 = -1, positionToAdd = getIntFromString(getStr(), &SET_POSITION_1);
+    int positionToAdd = getIntFromBeginString(getStr());
     city *subHead = getCityListFromConsole();
     printCityList(subHead);
 
@@ -550,33 +620,6 @@ prospect *addProsp(city* linkCity, int addNumber, prospect *addNode) {
     return head;
 }
 
-city *getCityListFromConsole() {
-    city *head = NULL;
-    int cityNum = 0, prospNum1 = 0, prospNum2 = 0;
-    char **cityStringArray = NULL, **prospStringArray1 = NULL, **prospStringArray2 = NULL;
-    cityStringArray = getStrArray(&cityNum, 0);
-    if (cityNum != 0) {
-        prospStringArray1 = getStrArray(&prospNum1, 1);
-        //printStringArray(prospStringArray1, prospNum1);
-
-        for (int i = 1; i < cityNum; i++) {
-            prospNum2 = 0;
-            prospStringArray2 = getStrArray(&prospNum2, 1);
-            //printStringArray(prospStringArray2, prospNum2);
-            prospStringArray1 = sumArrays(prospStringArray1, prospStringArray2, prospNum1, prospNum2);
-            prospNum1 += prospNum2;
-            //printStringArray(prospStringArray1, prospNum1);
-
-        }
-        //printStringArray(cityStringArray, cityNum);
-        //printStringArray(prospStringArray1, prospNum1);
-
-        head = createCity(cityStringArray, cityNum, prospStringArray1);
-
-    }
-    return head;
-}
-
 city *sortProspListNum(city *linkCity) {
     prospect *link = linkCity->prosp;
     for (; link != NULL; link = link->next) { // Пока не прошли список целиком...
@@ -629,7 +672,6 @@ city *sortProspListString(city *linkCity) {
 
 city *sortCityListNum(city *headCity, int input) {
     float field1 = 0, field2 = 0;
-    int SET_POSITION = -1;
     city *link = headCity;
     for (; link != NULL; link = link->next) {
         if (link->next != NULL) {
@@ -648,7 +690,7 @@ city *sortCityListNum(city *headCity, int input) {
                     break;
                 default:
                     ("No field to sort. Enter the field: \n");
-                    input = getIntFromString(getStr(), &SET_POSITION);
+                    input = getIntFromBeginString(getStr());
                     break;
             }
             if (field2 < field1) {
@@ -730,6 +772,7 @@ void putListToFile(city *head) {
 
     fclose(dataFileCity);
     fclose(dataFileProsp);
+    puts("Changes are saved");
 }
 
 //возвращает (1), если 1-ая строка должна стоять по алфавиту раньше 2-ой, иначе возвращает (2), если наоборот.
@@ -753,6 +796,7 @@ int compareStrings(char *string1, char *string2) {
 char **sumArrays(char **firstArray, char **secondArray, int firstNum, int secondNum) {
     for (int i = 0; i < secondNum; i++) {
         firstArray = (char **) realloc(firstArray, (firstNum + i + 1) * sizeof(char *));
+        memoryCheck(firstArray);
         firstArray[firstNum + i] = secondArray[i];
     }
     return firstArray;
@@ -768,216 +812,188 @@ void printStringArray(char **stringArray, int numString) {
     }
 }
 
+city *chooseNode(city *head) {
+    city *link = head;
+    if (head != NULL) {
+        printf("Choose the city node in which prospect list will be changed: ");
+        int selected = getIntFromBeginString(getStr());
+        for (int i = 1; i < selected && link -> next != NULL; link = link->next, i++);
+        printf("link name = [%s]", link -> name);
+    } else {
+        puts("City list is empty!");
+    }
+    return link;
+}
+
 int main() {
 
     city *head = NULL;
-
+    char **cityStringArray = NULL, **prospStringArray = NULL;
+    int cityStringNum, prospStringNum;
 
 
     int input = 1;
-    printf("Main menu. Choose one point from the menu below\n\n"
-                   "Press (1) to create list\n"
-                   "Press (2) to add node(-s)\n"
-                   "Press (3) to delete node(-s)\n"
-                   "Press (4) to sort nodes\n"
-                   "Press (5) to print list\n"
-                   "Press (6) to save changes to the file\n"
-                   "Press (0) to finish the program\n");
     while (input != 0) {
+        printf("Main menu. Choose one point from the menu below\n\n"
+                       "Press (1) to create list\n"
+                       "Press (2) to add node(-s)\n"
+                       "Press (3) to delete node(-s)\n"
+                       "Press (4) to sort nodes\n"
+                       "Press (5) to print list\n"
+                       "Press (6) to save changes to the file\n"
+                       "Press (0) to finish the program\n");
         input = getIntFromBeginString(getStr());
         switch (input) {
             case 1:
+                if (head != NULL) {
+                    puts("The list has been already created. Deleting that and continue . . .");
+                    freeCityList(head);
+                    head = NULL;
+                }
                 puts("Pressed 1\n");
                 printf("Submenu 1. Choose one point from the menu below\n"
                                "Press (1) to create list using console\n"
                                "Press (2) to create list using the files\n"
-                               "Press (0) to back to the main menu\n");
-                int subInput;
-                subInput = getIntFromBeginString(getStr());
-                switch (subInput) {
+                               "Press any other key to back to the main menu\n");
+                int subInput1;
+                subInput1 = getIntFromBeginString(getStr());
+                switch (subInput1) {
                     case 1:
                         head = getCityListFromConsole();
+                        printCityList(head);
                         break;
                     case 2:
-                        printf("Enter the nodes of the city list\n");
-                        char **string
+                        head = createCity(getStrArrayFromFile(&cityStringNum), cityStringNum,
+                                          getStrArrayFromFile(&prospStringNum));
+                        printCityList(head);
+                        break;
+                    default:
+                        puts("Return to the main menu . . .\n");
+                        break;
+                }
+                break;
+            case 2:
+                puts("Pressed 2\n");
+                printf("Submenu 2. Choose one point from the menu below\n"
+                               "Press (1) to add node(-s) to the prospect list\n"
+                               "Press (2) to add node(-s) to the city list\n"
+                               "Press any other key to back to the main menu\n");
+                int subInput2;
+                subInput2 = getIntFromBeginString(getStr());
+                switch (subInput2) {
+                    case 1:
+                        head = addIntervalProsp(chooseNode(head));
+                        printCityList(head);
+                        break;
+                    case 2:
+                        head = addIntervalCity(head);
+                        printCityList(head);
+                        break;
+                    default:
+                        puts("Return to the main menu . . .\n");
+                        break;
+                }
+                break;
+            case 3:
+                puts("Pressed 3\n");
+                printf("Submenu 3. Choose one point from the menu below\n"
+                               "Press (1) to delete node(-s) to the prospect list\n"
+                               "Press (2) to delete node(-s) to the city list\n"
+                               "Press any other key to back to the main menu\n");
+                int subInput3;
+                subInput3 = getIntFromBeginString(getStr());
+                switch (subInput3) {
+                    case 1:
+                        head = deleteIntervalProsp(chooseNode(head));
+                        printCityList(head);
+                        break;
+                    case 2:
+                        head = deleteIntervalCity(head);
+                        printCityList(head);
+                        break;
+                    default:
+                        puts("Return to the main menu . . .");
+                        break;
+                }
+                break;
+            case 4:
+                puts("Pressed 4\n");
+                printf("Submenu 4. Choose one point from the menu below\n"
+                               "Press (1) to sort nodes by the field 'name' in the city list\n"
+                               "Press (2) to sort nodes by the field 'foundation' in the city list\n"
+                               "Press (3) to sort nodes by the field 'number of prospects' in the city list\n"
+                               "Press (4) to sort nodes by the field 'population' in the city list\n"
+                               "Press (5) to sort nodes by the field 'name' in the prospect list\n"
+                               "Press (6) to sort nodes by the field 'number' in the prospect list\n"
+                               "Press any other key to back to the main menu\n");
+                int subInput4;
+                subInput4 = getIntFromBeginString(getStr());
+                switch (subInput4) {
+                    case 1:
+                        head = sortCityListString(head);
+                        printCityList(head);
+                        break;
+                    case 2:
+                        head = sortCityListNum(head, 1);
+                        printCityList(head);
+                        break;
+                    case 3:
+                        head = sortCityListNum(head, 2);
+                        printCityList(head);
+                        break;
+                    case 4:
+                        head = sortCityListNum(head, 3);
+                        printCityList(head);
+                        break;
+                    case 5:
+                        head = sortProspListString(chooseNode(head));
+                        printCityList(head);
+                        break;
+                    case 6:
+                        head = sortProspListNum(chooseNode(head));
+                        printCityList(head);
                         break;
                     default:
                         break;
                 }
-
                 break;
-            case 2:
-                printf("Pressed 2\n");
-                city *head1 = NULL;
-                head1 = getCityListFromConsole();
-                printCityList(head1);
-                head1 = addIntervalCity(head1);
-                printf("ending\n");
-                printCityList(head1);
-                break;
-            case 3:
-                printf("Pressed 3\n");
-                city *head2 = NULL;
-                head2 = getCityListFromConsole();
-                printCityList(head2);
-
-                head2 = sortCityListNum(head2, 3);
-                printCityList(head2);
-
-                break;
-            case 4:
-                printf("%d\n", compareStrings(string1, string2));
-                printf("Pressed 4\n");
-                city *head3 = NULL;
-                head3 = getCityListFromConsole();
-                printCityList(head3);
-
-                //printf("wqgfwf\n");
-                head3 = sortProspListNum(head3);
-                printProspList(head3 -> prosp);
-
-                putListToFile(head3);
-
-                strArr1 = getStrArrayFromFile(&numstr);
-                strArr2 = getStrArrayFromFile(&numstr2);
-
-                printStringArray(strArr1, numstr);
-                printStringArray(strArr2, numstr2);
-
-                headC = createCity(strArr1, numstr, strArr2);
-
-                printCityList(headC);
+            case 5:
+                puts("Pressed 5\n");
+                printf("Submenu 5. Choose one point from the menu below\n"
+                               "Press (1) to print city list\n"
+                               "Press (2) to print prospect list\n"
+                               "Press (3) to print city list reverse\n"
+                               "Press (4) to print prospect list reverse\n"
+                               "Press any other key to back to the main menu\n");
+                int subInput5;
+                subInput5 = getIntFromBeginString(getStr());
+                switch (subInput5) {
+                    case 1:
+                        printCityList(head);
+                        break;
+                    case 2:
+                        printProspList(chooseNode(head)->prosp);
+                        break;
+                    case 3:
+                        printCityListReverse(head);
+                        break;
+                    case 4:
+                        printProspListReverse(chooseNode(head)->prosp);
+                        break;
+                    default:
+                        break;
+                }
                 break;
             case 6:
-                strArr1 = getStrArrayFromFile(&numstr);
-                strArr2 = getStrArrayFromFile(&numstr2);
-
-                printStringArray(strArr1, numstr);
-                printStringArray(strArr2, numstr2);
-
-                headC = createCity(strArr1, numstr, strArr2);
-
-                printCityList(headC);
-                printCityListReverse(headC);
-
-                int pos1 = 2, pos2 = 4;
-                ///headC -> prosp = reverseNodes(headC -> prosp, pos1, pos2);
-
-                printProspList(headC -> prosp);
-                printProspListReverse(headC -> prosp);
-                break;
-            case 7:
-
-                break;
+                puts("Pressed 6\n");
+                putListToFile(head);
             case 0:
-                printf("Pressed 0. Finish the program\n");
-                exit(1);
+                puts("Pressed 0. Finish the program\n");
+                freeCityList(head);
+                exit(0);
             default:
                 break;
         }
 
     }
-
-
-
-
-
-    printf ("\nEnterpoint\n\n");
-
-    char **cityStringBase = NULL;
-    int numCityStringArr;
-    //cityStringBase = getStrArray(&numCityStringArr);
-    printf("\nCity: \n");
-    for (int i = 0; i < numCityStringArr; i++) {
-        for (int j = 0; cityStringBase[i][j] != '\0'; j++) {
-            printf("%c", cityStringBase[i][j]);
-        }
-        printf("\n");
-    }
-
-    char **prospectStringBase = NULL;
-    int numProspStringArr;
-    //prospectStringBase = getStrArray(&numProspStringArr);
-    printf("\nProsp: \n");
-    for (int i = 0; i < numProspStringArr; i++) {
-        for (int j = 0; prospectStringBase[i][j] != '\0'; j++) {
-            printf("%c", prospectStringBase[i][j]);
-        }
-        printf("\n");
-    }
-
-    printf("Endpoint5\n");
-
-    city *head = NULL;
-    head = createCity(cityStringBase, numCityStringArr, prospectStringBase);
-    printCityList(head);
-
-    printf("endpoint6\n");
-    printf("Enter the new node: ");
-    head ->prosp = addProsp(head -> prosp, 1, getStr());
-    printProspList(head -> prosp);
-
-
-    int numStringCity = 0, numStringProsp = 0;
-    char **stringArrayCity = NULL, **stringArrayProsp = NULL;
-    /*
-    /Users/artemkaloev/GitControl/CourseMain/COURSEMAIN/dataFile.txt
-    /Users/artemkaloev/GitControl/CourseMain/COURSEMAIN/dataProspFile.txt
-     */
-
-    stringArrayCity = getStrArrayFromFile(&numStringCity);
-    stringArrayProsp = getStrArrayFromFile(&numStringProsp);
-
-    city *mainHead = NULL;
-    mainHead = createCity(stringArrayCity, numStringCity, stringArrayProsp);
-
-    printCityList(mainHead);
-    //printCityListReverse(mainHead);
-
-    printf("Endpoint2\n");
-
-    int setPosition1 = 1, setPosition2 = 1;
-
-    mainHead = deleteIntervalCity(mainHead,setPosition1, setPosition2);
-
-    //проблемы: флоат 0 без точки = краш
-
-    printf("Endpoint3\n");
-    printCityList(mainHead);
-
-    printf("Endpoint4\n");
-    mainHead -> prosp = deleteProsp(mainHead, 1);
-    printCityList(mainHead);
-
-
-
-
-
-
-    /*
-    printf("\nCity: \n");
-    for (int i = 0; i < numStringCity; i++) {
-        for (int j = 0; stringArrayCity[i][j] != '\0'; j++) {
-            printf("%c", stringArrayCity[i][j]);
-        }
-        printf("\n");
-    }
-
-    printf("\nProsp: \n");
-    for (int i = 0; i < numStringProsp; i++) {
-        for (int j = 0; stringArrayProsp[i][j] != '\0'; j++) {
-            printf("%c", stringArrayProsp[i][j]);
-        }
-        printf("\n");
-    }
-     */
-
-    printf("ENDPOINT\n");
-    return 0;
 }
-
-
-//Добавление элемента списказ
-
-
