@@ -413,19 +413,19 @@ AUTHOR *AuthSortByNum (AUTHOR *Ahead, char field) {
     for (; tmp1 != NULL; tmp1 = tmp1->next) {
         if (tmp1->next != NULL) {
             switch (field) { // Выбор поля по передаваемому аргументу, чтобы не плодить большое количество одинаковых функций.
-                case '1':
+                case '1' :
                     AField1 = tmp1->birth;
                     AField2 = tmp1->next->birth;
                     break;
-                case '2':
+                case '2' :
                     AField1 = tmp1->death;
                     AField2 = tmp1->next->death;
                     break;
-                case '3':
+                case '3' :
                     AField1 = tmp1->numbook;
                     AField2 = tmp1->next->numbook;
                     break;
-                default:
+                default :
                     printf("No field, please, enter it again\n");
                     Ahead = AuthSortByNum(Ahead, getch());
                     break;
@@ -457,15 +457,15 @@ AUTHOR *AuthSortByAlphabet (AUTHOR *Ahead, char field) {
     for (; tmp1 != NULL; tmp1 = tmp1->next) {
         if (tmp1->next != NULL) {
             switch (field) { // Выбор поля по передаваемому аргументу, чтобы не плодить большое количество одинаковых функций.
-                case '1':
+                case '1' :
                     Field1 = tmp1->name;
                     Field2 = tmp1->next->name;
                     break;
-                case '2':
+                case '2' :
                     Field1 = tmp1->surname;
                     Field2 = tmp1->next->surname;
                     break;
-                default:
+                default :
                     printf("No field, please, enter it again\n");
                     Ahead = AuthSortByAlphabet(Ahead, getch());
                     break;
@@ -491,18 +491,42 @@ AUTHOR *AuthSortByAlphabet (AUTHOR *Ahead, char field) {
     return Ahead;
 }
 
-void PrintAuthIntoTheFile(AUTHOR *Ahead) {
+void PrintAuthIntoTheFile (AUTHOR *Ahead) {
     printf("WARNING! If something will go wrong, your data may be lost!\n"
                    "You can make another file if you want\n"
                    "Enter the way to the new file\n");
-    FILE *newBase = fopen(getstr(), "wb");
+    FILE *newBase = fopen(getstr(), "w");
     for (AUTHOR *tmp = Ahead; tmp != NULL; tmp = tmp->next) {
-        char *string = strcat(tmp->name, " ");
-        string = strcat(string, tmp->surname);
-        printf("%s", string);
-        fprintf(newBase,"%s %d %d %d\r\n", string, tmp->birth, tmp->death, tmp->numbook);
-        free (string);
+        for (int i = 0; tmp->name[i] != '\0'; i++) {
+            fputc(tmp->name[i], newBase);
+        }
+        fputc(' ', newBase);
+        for (int i = 0; tmp->surname[i] != '\0'; i++) {
+            fputc(tmp->surname[i], newBase);
+        }
+        fputc(' ', newBase);
+        fprintf(newBase, "%d %d %d\r\n", tmp->birth, tmp->death, tmp->numbook);
     }
+    fclose(newBase);
+}
+
+void PrintBookIntoTheFile (AUTHOR *Ahead) {
+    printf("WARNING! If something will go wrong, your data may be lost!\n"
+                   "You can make another file if you want\n"
+                   "Enter the way to the new file\n");
+    FILE *newBase = fopen(getstr(), "w");
+    for (AUTHOR *tmp = Ahead; tmp != NULL; tmp = tmp->next) {
+        for (int i = 0; tmp->name[i] != '\0'; i++) {
+            fputc(tmp->name[i], newBase);
+        }
+        fputc(' ', newBase);
+        for (int i = 0; tmp->surname[i] != '\0'; i++) {
+            fputc(tmp->surname[i], newBase);
+        }
+        fputc(' ', newBase);
+        fprintf(newBase, "%d %d %d\r\n", tmp->birth, tmp->death, tmp->numbook);
+    }
+    fclose(newBase);
 }
 
 void PrintBList (BOOK *Blist) {
