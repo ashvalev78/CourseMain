@@ -22,7 +22,7 @@ typedef struct AUTHOR {
     struct AUTHOR *prev;
 } AUTHOR;
 
-char *getstr() {
+char *getstr () {
     int i = -1;
     char *string = NULL;
     do {
@@ -33,7 +33,7 @@ char *getstr() {
     return string;
 }
 
-char **FGetABase(int *num) {
+char **FGetABase (int *num) {
     FILE *base;
     char **Amass = NULL;
     int j = 0;
@@ -63,7 +63,7 @@ char **FGetABase(int *num) {
     return Amass;
 }
 
-int getnum(int *j,char *str) {
+int getnum (int *j,char *str) {
     int p, num = 0;
     (*j)++;
     p = 3;
@@ -85,16 +85,16 @@ char *getString (char *str, int *i) {
         k++;
         (*i)++;
         string = (char*)realloc(string, (k + 1) * sizeof(char));
-    } while ((string[k] = str[*i]) != ' ');
+    } while ((string[k] = str[*i]) != ' ' && string[k] != '\0');
     string[k] = '\0';
     return string;
 }
 
-BOOK *BooksListFromString(char **str, int num, int *quan, int *strnum) { // Функция для создания списка книг из полученного списка строк. Функция для последующей работы с файлами.
+BOOK *BooksListFromString (char **str, int num, int *quan, int *strnum) { // Функция для создания списка книг из полученного списка строк. Функция для последующей работы с файлами.
     BOOK *nhead = NULL, *head = NULL, *tmp;
     int p = NULL;
     if (num == 0) return NULL;
-    for (int j = 0; *strnum < num && str[*strnum][0] != '*'; (*strnum)++) {
+    for (int j = 0; *strnum < num && str[*strnum][0] != '*'; tmp = tmp->next, (*strnum)++) {
         j = 0;
         tmp = (BOOK*)malloc(sizeof(BOOK));
         if (p == NULL)
@@ -112,16 +112,14 @@ BOOK *BooksListFromString(char **str, int num, int *quan, int *strnum) { // Фу
         head = tmp;
         if (head->prev != NULL)
             head->prev->next = head;
-        tmp = tmp->next;
         (*quan)++;
     }
     (*strnum)++;
     return nhead;
 } // quan - количество книг автора.
 
-AUTHOR *AuthListFromString(char **str, int num, char **BookMass, int Bnum) { // Функция создания списка авторов из полученного списка строк. Функция для работы с файлом.
+AUTHOR *AuthListFromString (char **str, int num, char **BookMass, int Bnum) { // Функция создания списка авторов из полученного списка строк. Функция для работы с файлом.
     AUTHOR *nhead = NULL, *head = NULL, *tmp;
-    printf("NUMBER IS %d\n", num);
     int BookStrNum = 0;
     for (int i = 0; i < num; i++) {
         tmp = (AUTHOR*)malloc(sizeof(AUTHOR));
@@ -172,7 +170,7 @@ AUTHOR *AuthListFromString(char **str, int num, char **BookMass, int Bnum) { // 
     return nhead;
 }
 
-BOOK *DeleteBElement(BOOK *head, int delNumber) {
+BOOK *DeleteBElement (BOOK *head, int delNumber) {
     if (head != NULL) {
         BOOK *tmp = head;
         for (int i = 1; i < delNumber; i++) {
@@ -198,14 +196,14 @@ BOOK *DeleteBElement(BOOK *head, int delNumber) {
     return head;
 }
 
-BOOK *DeleteBFrag(BOOK *head, int num1, int num2) {
+BOOK *DeleteBFrag (BOOK *head, int num1, int num2) {
     for (int i = num1; i <= num2; i++) {
         head = DeleteBElement(head, num1);
     }
     return head;
 }
 
-AUTHOR *DeleteAElement(AUTHOR *head, int delNumber) {
+AUTHOR *DeleteAElement (AUTHOR *head, int delNumber) {
     if (head != NULL) {
         AUTHOR *tmp = head;
         for (int i = 1; i < delNumber; i++) {
@@ -233,13 +231,13 @@ AUTHOR *DeleteAElement(AUTHOR *head, int delNumber) {
     return head;
 }
 
-AUTHOR *DeleteAFrag(AUTHOR *head, int num1, int num2) {
+AUTHOR *DeleteAFrag (AUTHOR *head, int num1, int num2) {
     for (int i = num1; i <= num2; i++)
         head = DeleteAElement(head, num1);
     return head;
 }
 
-char **SumArrays(char **FirstArray, char **SecondArray, int FirstNum, int SecondNum) {
+char **SumArrays (char **FirstArray, char **SecondArray, int FirstNum, int SecondNum) {
     for (int i = 0; i < SecondNum; i++) {
         FirstArray = (char**)realloc(FirstArray, (FirstNum + i + 1) * sizeof(char*));
         FirstArray[FirstNum + i] = SecondArray[i];
@@ -247,7 +245,7 @@ char **SumArrays(char **FirstArray, char **SecondArray, int FirstNum, int Second
     return FirstArray;
 }
 
-char **getArray(int *numString, int structure) {
+char **getArray (int *numString, int structure) {
     int pos = -1, i;
     char **stringArray = NULL;
     printf("Enter number of elements: ");
@@ -266,7 +264,7 @@ char **getArray(int *numString, int structure) {
     return stringArray;
 }
 
-AUTHOR *GetAuth() {
+AUTHOR *GetAuth () {
     AUTHOR *Auth;
     int Anum = 0, Bnum1 = 0, Bnum2;
     char **AuthArray = getArray(&Anum, 0);
@@ -284,7 +282,7 @@ AUTHOR *GetAuth() {
     return Auth;
 }
 
-AUTHOR *AddBookFragment(AUTHOR *AElement) {
+AUTHOR *AddBookFragment (AUTHOR *AElement) {
     printf("Enter the number of element after which you want to add another\n");
     int pos = -1, NumBook = 0, StrNum = 0, BookNum = 0, addNumber = getnum(&pos, getstr());
     char **BookFrag = getArray(&BookNum, 1); // Получаем массив книг, который впоследствии преобразуем в список для вставки.
@@ -316,7 +314,7 @@ AUTHOR *AddBookFragment(AUTHOR *AElement) {
     return AElement;
 }
 
-AUTHOR *AddAuthFragment(AUTHOR *Ahead) { // В данной функции все аналогично функции AddBookFragment
+AUTHOR *AddAuthFragment (AUTHOR *Ahead) { // В данной функции все аналогично функции AddBookFragment
 
     printf("Enter the number of element after which you want to add another\n");
     int pos = -1, addNumber = getnum(&pos, getstr());
@@ -347,7 +345,6 @@ AUTHOR *AddAuthFragment(AUTHOR *Ahead) { // В данной функции вс�
 }
 
 int CheckStrings(char *str1, char *str2) {
-    printf("%s\t%s\n", str1, str2);
     for (int i = 0; str1[i] != '\0' && str2[i] != '\0'; i++) {
         if (str1[i] < str2[i]) {
             return 0;
@@ -360,7 +357,32 @@ int CheckStrings(char *str1, char *str2) {
     return 0;
 }
 
-AUTHOR *BookSortByNum(AUTHOR *AElement) {
+AUTHOR *BookSortByAlphabet (AUTHOR *Ahead) {
+    BOOK *tmp1 = Ahead->books;
+    for (; tmp1 != NULL; tmp1 = tmp1->next) {
+        if (tmp1->next != NULL) {
+            if (CheckStrings(tmp1->name, tmp1->next->name) > 0) {
+                BOOK *tmp2 = tmp1->next;
+                tmp1->next = tmp2->next;
+                if (tmp2->next != NULL) {
+                    tmp2->next->prev = tmp1;
+                }
+                tmp2->prev = tmp1->prev;
+                tmp2->next = tmp1;
+                if (tmp1 == Ahead->books) {
+                    Ahead->books = tmp2;
+                } else {
+                    tmp1->prev->next = tmp2;
+                }
+                tmp1->prev = tmp2;
+                Ahead = BookSortByAlphabet(Ahead); // Рекурсивно вызываем функцию на повторную проверку, если мы меняли их местами.
+            }
+        }
+    }
+    return Ahead;
+}
+
+AUTHOR *BookSortByNum (AUTHOR *AElement) {
     BOOK *tmp1 = AElement->books;
     for (; tmp1 != NULL; tmp1 = tmp1->next) { // Пока не прошли список целиком...
         if (tmp1->next != NULL) { // Если в списке не один элемент...
@@ -385,7 +407,7 @@ AUTHOR *BookSortByNum(AUTHOR *AElement) {
     return AElement;
 }
 
-AUTHOR *AuthSortByNum(AUTHOR *Ahead, char field) {
+AUTHOR *AuthSortByNum (AUTHOR *Ahead, char field) {
     int AField1 = 0, AField2 = 0;
     AUTHOR *tmp1 = Ahead;
     for (; tmp1 != NULL; tmp1 = tmp1->next) {
@@ -429,7 +451,7 @@ AUTHOR *AuthSortByNum(AUTHOR *Ahead, char field) {
     return Ahead;
 }
 
-AUTHOR *AuthSortByAlphabet(AUTHOR *Ahead, char field) {
+AUTHOR *AuthSortByAlphabet (AUTHOR *Ahead, char field) {
     char *Field1, *Field2;
     AUTHOR *tmp1 = Ahead;
     for (; tmp1 != NULL; tmp1 = tmp1->next) {
@@ -469,6 +491,20 @@ AUTHOR *AuthSortByAlphabet(AUTHOR *Ahead, char field) {
     return Ahead;
 }
 
+void PrintAuthIntoTheFile(AUTHOR *Ahead) {
+    printf("WARNING! If something will go wrong, your data may be lost!\n"
+                   "You can make another file if you want\n"
+                   "Enter the way to the new file\n");
+    FILE *newBase = fopen(getstr(), "wb");
+    for (AUTHOR *tmp = Ahead; tmp != NULL; tmp = tmp->next) {
+        char *string = strcat(tmp->name, " ");
+        string = strcat(string, tmp->surname);
+        printf("%s", string);
+        fprintf(newBase,"%s %d %d %d\r\n", string, tmp->birth, tmp->death, tmp->numbook);
+        free (string);
+    }
+}
+
 void PrintBList (BOOK *Blist) {
     if (Blist == NULL) printf("NO BOOKS!\n");
     else {
@@ -506,6 +542,8 @@ int main()
     //AddAuthorFragment(Ahead, Ahead, 2);
     //Ahead = AddAuthFragment(Ahead);
     Ahead = AuthSortByAlphabet(Ahead, '1');
+    //Ahead->next = BookSortByAlphabet(Ahead->next);
     PrintAList(Ahead);
+    PrintAuthIntoTheFile(Ahead);
     return 0;
 }

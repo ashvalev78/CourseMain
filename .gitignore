@@ -76,7 +76,7 @@ vcs.xml
 .idea/**/libraries
 
 # CMake
-cmake-build-debug/
+cmake-build-debug/NewFile.txt
 
 # Mongo Explorer plugin:
 .idea/**/mongoSettings.xml
@@ -104,3 +104,4 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 .idea/
+/NewFile.txt
