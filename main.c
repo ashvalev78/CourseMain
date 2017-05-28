@@ -90,6 +90,38 @@ char *getString (char *str, int *i) {
     return string;
 }
 
+AUTHOR *ReverseList (AUTHOR *Ahead) {
+    if (Ahead != NULL) {
+        AUTHOR *tmp = Ahead;
+        for (; tmp->next != NULL; tmp = tmp->prev) {
+            AUTHOR *tmp1 = tmp->next;
+            tmp->next = tmp->prev;
+            tmp->prev = tmp1;
+        }
+        tmp->next = tmp->prev;
+        tmp->prev = NULL;
+        Ahead = tmp;
+    }
+    return Ahead;
+}
+
+AUTHOR *ReverseBooksList (AUTHOR *Ahead) {
+    if (Ahead != NULL) {
+        BOOK *tmp = Ahead->books;
+        if (tmp != NULL) {
+            for (; tmp->next != NULL; tmp = tmp->prev) {
+                BOOK *tmp1 = tmp->next;
+                tmp->next = tmp->prev;
+                tmp->prev = tmp1;
+            }
+            tmp->next = tmp->prev;
+            tmp->prev = NULL;
+            Ahead->books = tmp;
+        }
+    }
+    return Ahead;
+}
+
 BOOK *BooksListFromString (char **str, int num, int *quan, int *strnum) { // Функция для создания списка книг из полученного списка строк. Функция для последующей работы с файлами.
     BOOK *nhead = NULL, *head = NULL, *tmp;
     int p = NULL;
@@ -526,7 +558,7 @@ void PrintBList (BOOK *Blist) {
     else {
         int i = 1;
         for (BOOK *tmp = Blist; tmp != NULL; tmp = tmp->next, i++) {
-            printf("\t[%d] BOOK:\t%s Date: %d\n", i, tmp->name, tmp->year);
+            printf("\t[%d] BOOK:\tName: %s Date: %d\n", i, tmp->name, tmp->year);
         }
     }
 }
@@ -544,7 +576,7 @@ void PrintAList (AUTHOR *Alist) {
 }
 
 void menu () {
-    printf("\tMENU\n"
+    printf("\t\tMENU\n"
                    "\tAuthor string format: Name Surname Birth Death (Number of books)\n"
                    "\tBook string format: Name_of_the_book Year\n"
                    "\tPress 0 to escape the program\n"
@@ -554,19 +586,25 @@ void menu () {
                    "\tPress 4 to add some elements into the lists\n"
                    "\tPress 5 to delete some elements from your lists\n"
                    "\tPress 6 to sort your lists\n"
-                   "\tPress 7 to save your changes\n ");
+                   "\tPress 7 to output the lists\n"
+                   "\tPress 8 to save your changes\n");
 }
 
 int main()
 {
-    int Anum = 0, Bnum = 0;
+    int Anum = 0, Bnum = 0, num = 0, num1, num2;
     char **Auth, **Books;
     char input1, input2;
-    AUTHOR *Ahead = NULL;
+    AUTHOR *Ahead = NULL, *tmp = NULL;
     menu ();
+    /*Auth = FGetABase(&Anum);
+    Books = FGetABase(&Bnum);
+    Ahead = AuthListFromString(Auth, Anum, Books, Bnum);
+    Ahead = ReverseList(Ahead);
+    Ahead->next->next->next = ReverseBooksList(Ahead->next->next->next);*/
     while ((input1 = getch()) != '0') {
         switch (input1) {
-            case '1' :
+            case '1' : // Вывод меню.
                 menu();
                 break;
             case '2' :
@@ -581,17 +619,58 @@ int main()
                 break;
             case '4' :
                 printf("Press 1 to add elements into the authors list\n"
-                               "Press 2 to add elements into the someones books list\n ");
+                               "Press 2 to add elements into the someones books list\n"
+                               "Press 0 to exit this option\n");
                 while ((input2 = getch()) != '0') {
                     switch (input2) {
                         case '1' :
-
+                            Ahead = AddAuthFragment(Ahead);
+                            break;
+                        case '2' :
+                            printf("Enter the number of author, whose books list you want to change\n");
+                            scanf("%d", &num);
+                            tmp = Ahead;
+                            for (int i = 0; i < num; i++) { // Доходим до нужного элемента.
+                                tmp = tmp->next;
+                            }
+                            tmp = AddBookFragment(tmp);
                             break;
                         default :
                             printf("You've chosen the wrong number, try again\n");
                             break;
                     }
                 }
+                break;
+            case '5' :
+                printf("Press 1 to delete elements into the authors list\n"
+                               "Press 2 to delete elements into the someones books list\n"
+                               "Press 0 to exit this option\n");
+                while ((input2 = getch()) != '0') {
+                    switch (input2) {
+                        case '1' :
+                            printf("Enter the interval you want to delete\n");
+                            scanf("%d %d", &num1, &num2);
+                            Ahead = DeleteAFrag(Ahead, num1, num2);
+                            break;
+                        case '2' :
+                            printf("Enter the number of author, whose books list you want to change\n");
+                            scanf("%d", &num);
+                            tmp = Ahead;
+                            for (int i = 0; i < num; i++) { // Доходим до нужного элемента.
+                                tmp = tmp->next;
+                            }
+                            printf("Enter the interval you want to delete\n");
+                            scanf("%d %d", &num1, &num2);
+                            tmp->books = DeleteBFrag(tmp->books, num1, num2);
+                            break;
+                        default :
+                            printf("You've chosen the wrong number, try again\n");
+                            break;
+                    }
+                }
+                break;
+            case '6' :
+
                 break;
             default :
                 printf("Please, eneter another number\n");
@@ -603,9 +682,9 @@ int main()
     //Ahead = DeleteAFrag(Ahead, 1, 2);
     //AddAuthorFragment(Ahead, Ahead, 2);
     //Ahead = AddAuthFragment(Ahead);
-    Ahead = AuthSortByAlphabet(Ahead, '1');
+    //Ahead = AuthSortByAlphabet(Ahead, '1');
     //Ahead->next = BookSortByAlphabet(Ahead->next);
     PrintAList(Ahead);
-    PrintAuthIntoTheFile(Ahead);
+    //PrintAuthIntoTheFile(Ahead);
     return 0;
 }
