@@ -1,5 +1,4 @@
-evgen 1
-roma 2
-stepa 3
-nigga 4
-dendi 5
+h 6
+j6 4294967248
+h 7
+~

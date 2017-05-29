@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
+#include <string.h>
 
 typedef struct prospect {
 
@@ -22,7 +22,6 @@ typedef struct city {
 } city;
 
 char **sumArrays(char **firstArray, char** secondArray, int firstNum, int SecondNum);
-city *getCityListFromConsole();
 void printStringArray(char **stringArray, int numString);
 int compareStrings(char *string1, char *string2);
 
@@ -30,6 +29,7 @@ void freeArray(char** array, int size);
 void freeProspList(prospect *head);
 void freeCityList(city *head);
 
+void memoryCheck(void *pointer);
 char *getStr ();
 
 void printProspList(prospect *head);
@@ -51,10 +51,21 @@ char **getStrArray(int *numString, int prosp);
 char **getStrArrayFromFile (int *numString);
 city *getCityListFromConsole();
 
-prospect *deleteProsp(city *linkCity, int delNumber);
+city *deleteProsp(city *linkCity, int delNumber);
+city *deleteIntervalProsp(city* linkCity);
+city *deleteCity(city *headCity, int delNumber);
+city *deleteIntervalCity(city *headCity);
 
+city *addIntervalProsp(city *linkCity);
+city *addIntervalCity(city *headCity);
 
+city *sortProspListNum(city *linkCity);
+city *sortProspListString(city *linkCity);
+city *sortCityListNum(city *headCity, int input);
+city *sortCityListString(city *head);
 
+void putListToFile(city *head);
+city *chooseNode(city *head);
 
 void memoryCheck(void *pointer)
 {
@@ -64,23 +75,6 @@ void memoryCheck(void *pointer)
         exit(1);
     }
 }
-/*
-void freeCityList(city *head)
-{
-    if (head != NULL) {
-        city *link = head;
-        while (link != NULL)
-        {
-            city *tmp = link;
-            link = link -> next;
-            free(tmp);
-        }
-    } else {
-        printf("The list is empty\n");
-    }
-    free(head);
-}
-*/
 
 void freeArray(char** array, int size) {
     if (array != NULL) {
@@ -251,7 +245,7 @@ float getFloatFromString(char *string, int *numPosition) {
      * F - результирующее число
      * F1 - целая часть вещественного числа
      * F2 - мантисса
-     * numPosition - текущая позиция элемента в строке
+     * numPosition - текущая позиция элемента в строке "минус" один
      * eldPosition - позиция элемента, разделяющего мантиссу и целую часть числа
      * string - обрабатываемая строка
      */
@@ -275,7 +269,7 @@ char *getSubstringFromString(char *string, int *numPosition) {
     /*
      * substring - результирующая строка
      * string - исходная строка
-     * numPosition - текущая позиция элемента в строке
+     * numPosition - текущая позиция элемента в строке "минус" один
      */
 
     char* substring = NULL;
@@ -290,7 +284,7 @@ char *getSubstringFromString(char *string, int *numPosition) {
 
 prospect *createProspNode(char *string) {
 
-    //ограниченное кол-о проспнодов
+        //ограниченное кол-о проспнодов
     prospect *link = NULL;
     if (string[0] != '\0') {
         link = (prospect *) malloc(sizeof(prospect));
@@ -353,6 +347,7 @@ city *createCity(char **baseString, int numString, char **baseProspString) {
 char **getStrArray(int *numString, int prosp) {
     char **stringArray = NULL;
     *numString = getIntFromBeginString(getStr());
+
     puts("Enter strings to form the list");
     int i;
     for (i = 0; i < *numString; i++) {
@@ -371,15 +366,13 @@ char **getStrArray(int *numString, int prosp) {
 }
 
 char **getStrArrayFromFile (int *numString) {
-    char *wayToFile = NULL;
     printf("Enter the way to the file: ");
-    wayToFile = getStr();
 
     FILE *dataFile = NULL;
     char **stringArray = NULL;
 
     //проверка на успешное открытие файла
-    if ((dataFile = fopen(wayToFile, "r")) != NULL) {
+    if ((dataFile = fopen(getStr(), "r")) != NULL) {
         fseek(dataFile, 0, SEEK_END);
         int file_size = ftell(dataFile);
         if (file_size != 0) {
@@ -406,6 +399,10 @@ char **getStrArrayFromFile (int *numString) {
 
 //????????????????????
 city *getCityListFromConsole() {
+    printf("Warning!\n"
+                   "Print 'city' data in format 'Name FoundationDate Population NumberOfProspect'\n"
+                   "Print 'prospect' data in format 'Name Number'\n"
+                   "The use of another input format entails errors and an emergency program termination\n");
     city *head = NULL;
     int cityNum = 0, prospNum1 = 0, prospNum2 = 0;
     char **cityStringArray = NULL, **prospStringArray1 = NULL, **prospStringArray2 = NULL;
@@ -423,20 +420,16 @@ city *getCityListFromConsole() {
         }
         head = createCity(cityStringArray, cityNum, prospStringArray1);
     }
-    //нужно ли освобождать??
-    freeArray(cityStringArray, cityNum);
-    freeArray(prospStringArray1, prospNum1);
-    freeArray(prospStringArray2, prospNum2);
 
     return head;
 }
 
-prospect *deleteProsp(city *linkCity, int delNumber) {
+city *deleteProsp(city *linkCity, int delNumber) {
     prospect *headProsp = linkCity -> prosp;
     if (headProsp != NULL) {
         prospect *link = headProsp;
         for (int i = 1; i < delNumber; i++) {
-            if (link->next == NULL) return headProsp;
+            if (link->next == NULL) return linkCity;
             link = link->next;
         }
         if (delNumber == 1) {
@@ -456,7 +449,7 @@ prospect *deleteProsp(city *linkCity, int delNumber) {
         free(link->name);
         free(link);
     }
-    return headProsp;
+    return linkCity;
 }
 
 city *deleteIntervalProsp(city* linkCity) {
@@ -468,7 +461,7 @@ city *deleteIntervalProsp(city* linkCity) {
     int setPosition2 = getIntFromBeginString(getStr());
 
     for (int i = setPosition1; i <= setPosition2; i++) {
-        linkCity -> prosp = deleteProsp(linkCity, setPosition1);
+        linkCity = deleteProsp(linkCity, setPosition1);
         printProspList(linkCity -> prosp);
     }
     return linkCity;
@@ -591,6 +584,7 @@ city *addIntervalCity(city *headCity) {
 
 }
 
+/*
 prospect *addProsp(city* linkCity, int addNumber, prospect *addNode) {
     prospect *head = linkCity -> prosp;
     prospect *link = head;
@@ -619,6 +613,7 @@ prospect *addProsp(city* linkCity, int addNumber, prospect *addNode) {
     (linkCity -> prospNumber)++;
     return head;
 }
+*/
 
 city *sortProspListNum(city *linkCity) {
     prospect *link = linkCity->prosp;
@@ -783,13 +778,8 @@ int compareStrings(char *string1, char *string2) {
         if (string1[i] > string2[i]) return 2;
         else if (string1[i] < string2[i]) return  1;
     }
-
-    if (string1[i] != '\0') {
-        if (string2[i] == '\0')
-            return 2;
-        else return 0;
-    } else if (string2[i] != '\0')
-        return 1;
+    if (strlen(string1) < strlen(string2)) return 1;
+    else if (strlen(string1) > strlen(string2)) return 2;
     else return 0;
 }
 
@@ -818,7 +808,7 @@ city *chooseNode(city *head) {
         printf("Choose the city node in which prospect list will be changed: ");
         int selected = getIntFromBeginString(getStr());
         for (int i = 1; i < selected && link -> next != NULL; link = link->next, i++);
-        printf("link name = [%s]", link -> name);
+        printf("You choosed the city '%s'", link -> name);
     } else {
         puts("City list is empty!");
     }
@@ -830,7 +820,6 @@ int main() {
     city *head = NULL;
     char **cityStringArray = NULL, **prospStringArray = NULL;
     int cityStringNum, prospStringNum;
-
 
     int input = 1;
     while (input != 0) {
@@ -987,13 +976,14 @@ int main() {
             case 6:
                 puts("Pressed 6\n");
                 putListToFile(head);
+                break;
             case 0:
                 puts("Pressed 0. Finish the program\n");
                 freeCityList(head);
-                exit(0);
+                break;
             default:
                 break;
         }
-
     }
+    return 0;
 }
