@@ -330,17 +330,20 @@ city *createCityNode(char *string, char **baseProspString, int *countProsp) {
 }
 
 city *createCity(char **baseString, int numString, char **baseProspString) {
-    city *head = NULL, *link = NULL;
-    int countProsp = 0;
-    head = link = createCityNode(baseString[0], baseProspString, &countProsp);
-    link->prev = NULL;
-    for (int i = 1; i < numString; i++) {
-        //вычленить кусок массива из общего исходного массива
-        link->next = createCityNode(baseString[i], baseProspString, &countProsp);
-        link->next->prev = link;
-        link = link->next;
+    city *head = NULL;
+    if (baseString != NULL && baseProspString != NULL) {
+        city *link;
+        int countProsp = 0;
+        head = link = createCityNode(baseString[0], baseProspString, &countProsp);
+        link->prev = NULL;
+        for (int i = 1; i < numString; i++) {
+            //вычленить кусок массива из общего исходного массива
+            link->next = createCityNode(baseString[i], baseProspString, &countProsp);
+            link->next->prev = link;
+            link = link->next;
+        }
+        link->next = NULL;
     }
-    link->next = NULL;
     return head;
 }
 
@@ -353,7 +356,7 @@ char **getStrArray(int *numString, int prosp) {
     for (i = 0; i < *numString; i++) {
         stringArray = (char **) realloc(stringArray, (i + 1) * sizeof(char *));
         memoryCheck(stringArray);
-        stringArray[i] = NULL;
+        //stringArray[i] = NULL;
         stringArray[i] = getStr();
     }
     if (prosp) {
@@ -367,15 +370,11 @@ char **getStrArray(int *numString, int prosp) {
 
 char **getStrArrayFromFile (int *numString) {
     printf("Enter the way to the file: ");
-
     FILE *dataFile = NULL;
     char **stringArray = NULL;
-
-    //проверка на успешное открытие файла
     if ((dataFile = fopen(getStr(), "r")) != NULL) {
         fseek(dataFile, 0, SEEK_END);
-        int file_size = ftell(dataFile);
-        if (file_size != 0) {
+        if (ftell(dataFile) != 0) {
             fseek(dataFile, 0, SEEK_SET);
             int i;
             for (i = 0; !feof(dataFile); i++) {
@@ -390,14 +389,13 @@ char **getStrArrayFromFile (int *numString) {
                 } while ((stringArray[i][j] = (char) fgetc(dataFile)) != '\n' && stringArray[i][j] != EOF);
                 stringArray[i][j] = '\0';
             }
-            fclose(dataFile);
             *numString = i;
-            return stringArray;
         }
+        fclose(dataFile);
     }
+    return stringArray;
 }
 
-//????????????????????
 city *getCityListFromConsole() {
     printf("Warning!\n"
                    "Print 'city' data in format 'Name FoundationDate Population NumberOfProspect'\n"
@@ -417,10 +415,12 @@ city *getCityListFromConsole() {
             prospStringArray2 = getStrArray(&prospNum2, 1);
             prospStringArray1 = sumArrays(prospStringArray1, prospStringArray2, prospNum1, prospNum2);
             prospNum1 += prospNum2;
+            char **tmp = prospStringArray2;
+            prospStringArray2 = NULL;
+            free(tmp);
         }
         head = createCity(cityStringArray, cityNum, prospStringArray1);
     }
-
     return head;
 }
 
