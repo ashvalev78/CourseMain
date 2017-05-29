@@ -632,11 +632,13 @@ int main()
                 Books = FGetABase(&Bnum);// Получение массива книг из файла.
                 Ahead = AuthListFromString(Auth, Anum, Books, Bnum); // преобразование массивов авторов и книг в списки.
                 PrintAList(Ahead);
+                printf("Done!\n");
                 break;
             case '3' :
                 ch = getch();
                 Ahead = GetAuth();
                 PrintAList(Ahead);
+                printf("Done!\n");
                 break;
             case '4' :
                 ch = getch();
@@ -666,6 +668,7 @@ int main()
                             break;
                     }
                 }
+                printf("Done!\n");
                 break;
             case '5' :
                 ch = getch();
@@ -701,6 +704,7 @@ int main()
                     }
                 }
                 PrintAList(Ahead);
+                printf("Done!\n");
                 break;
             case '6' :
                 ch = getch();
@@ -724,7 +728,7 @@ int main()
                                 scanf("%c", &field);
                                 Ahead = AuthSortByAlphabet(Ahead, field);
                             }
-                            printf("If you wanted to make reverse-sort, press 1, else - press any key\n");
+                            printf("If you wanted to make reverse-sort, press 1, else - press any key)\n");
                             if ((field = getch()) == '1') {
                                 Ahead = ReverseList(Ahead);
                             }
@@ -745,7 +749,7 @@ int main()
                             else {
                                 tmp = BookSortByAlphabet(tmp);
                             }
-                            printf("If you wanted to make reverse-sort, press 1, else - press any key\n");
+                            printf("If you wanted to make reverse-sort, press 1, else - press any key)\n");
                             if ((field = getch()) == '1') {
                                 tmp = ReverseBooksList(tmp);
                             }
@@ -756,6 +760,7 @@ int main()
                     }
                 }
                 PrintAList(Ahead);
+                printf("Done!\n");
                 break;
             case '7' :
                 ch = getch();
@@ -766,6 +771,7 @@ int main()
             case '8' :
                 ch = getch();
                 PrintAuthIntoTheFile(Ahead);
+                printf("Got it!\n");
                 break;
             default :
                 printf("Please, enter another number\n");
