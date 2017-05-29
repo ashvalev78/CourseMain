@@ -3,6 +3,7 @@
 #include <conio.h>
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
 
 typedef struct BOOK {
     char *name;
@@ -22,12 +23,21 @@ typedef struct AUTHOR {
     struct AUTHOR *prev;
 } AUTHOR;
 
+void MemCheck (void *a)
+{
+    if (a == NULL) {
+        printf ("No Memory!\n");
+        exit(1);
+    }
+}
+
 char *getstr () {
     int i = -1;
     char *string = NULL;
     do {
         i++;
         string = (char*)realloc(string, (i + 1) * sizeof(char));
+        MemCheck(string);
         string[i] = getchar();
         if (string[0] == '\n')
             string[i] = getchar();
@@ -51,11 +61,14 @@ char **FGetABase (int *num) {
             Amass[*num][j] = (char)fgetc(base);
             j++;
             Amass[*num] = (char*)realloc(Amass[*num], (j + 1) * sizeof(char));
+            MemCheck(Amass[*num]);
             if (Amass[*num][j - 1] == '\n') {
                 Amass[*num][j - 1] = '\0';
                 (*num)++;
                 Amass = (char**)realloc(Amass, (*num + 1) * sizeof(char*));
+                MemCheck(Amass);
                 Amass[*num] = (char*)malloc(sizeof(char));
+                MemCheck(Amass[*num]);
                 j = 0;
             }
         } while (Amass[*num][j] != EOF);
@@ -87,6 +100,7 @@ char *getString (char *str, int *i) {
         k++;
         (*i)++;
         string = (char*)realloc(string, (k + 1) * sizeof(char));
+        MemCheck(string);
     } while ((string[k] = str[*i]) != ' ' && string[k] != '\0');
     string[k] = '\0';
     return string;
@@ -125,12 +139,13 @@ AUTHOR *ReverseBooksList (AUTHOR *Ahead) {
 }
 
 BOOK *BooksListFromString (char **str, int num, int *quan, int *strnum) { // Функция для создания списка книг из полученного списка строк. Функция для последующей работы с файлами.
-    BOOK *nhead = NULL, *head = NULL, *tmp;
+    BOOK *nhead = NULL, *head = NULL, *tmp = NULL;
     int p = NULL;
     if (num == 0) return NULL;
     for (int j = 0; *strnum < num && str[*strnum][0] != '*'; tmp = tmp->next, (*strnum)++) {
         j = 0;
         tmp = (BOOK*)malloc(sizeof(BOOK));
+        MemCheck(tmp);
         if (p == NULL)
             nhead = tmp;
         p++;
@@ -151,10 +166,11 @@ BOOK *BooksListFromString (char **str, int num, int *quan, int *strnum) { // Ф�
 } // quan - количество книг автора.
 
 AUTHOR *AuthListFromString (char **str, int num, char **BookMass, int Bnum) { // Функция создания списка авторов из полученного списка строк. Функция для работы с файлом.
-    AUTHOR *nhead = NULL, *head = NULL, *tmp;
+    AUTHOR *nhead = NULL, *head = NULL, *tmp = NULL;
     int BookStrNum = 0;
     for (int i = 0; i < num; i++) {
         tmp = (AUTHOR*)malloc(sizeof(AUTHOR));
+        MemCheck(tmp);
         if (i == 0)
             nhead = tmp;
         tmp->next = NULL;
@@ -272,6 +288,7 @@ char **getArray (int *numString, int structure) {
     for (i = 0; i < *numString; i++) {
         printf("Enter the element:\n");
         stringArray = (char **) realloc(stringArray, (i + 1) * sizeof(char*));
+        MemCheck(stringArray);
         stringArray[i] = NULL;
         stringArray[i] = getstr();
     }
@@ -335,7 +352,6 @@ AUTHOR *AddBookFragment (AUTHOR *AElement) {
 }
 
 AUTHOR *AddAuthFragment (AUTHOR *Ahead) { // В данной функции все аналогично функции AddBookFragment
-
     printf("Enter the number of element after which you want to add another\n");
     int pos = -1, addNumber = getnum(&pos, getstr());
     AUTHOR *AFragHead = GetAuth();
