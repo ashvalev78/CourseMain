@@ -141,7 +141,7 @@ AUTHOR *ReverseBooksList (AUTHOR *Ahead) {
 BOOK *BooksListFromString (char **str, int num, int *quan, int *strnum) { // Функция для создания списка книг из полученного списка строк. Функция для последующей работы с файлами.
     BOOK *nhead = NULL, *head = NULL, *tmp = NULL;
     int p = NULL;
-    if (num == 0) return NULL;
+    if (num == 0) return nhead;
     for (int j = 0; *strnum < num && str[*strnum][0] != '*'; tmp = tmp->next, (*strnum)++) {
         j = 0;
         tmp = (BOOK*)malloc(sizeof(BOOK));
@@ -276,7 +276,10 @@ char **SumArrays (char **FirstArray, char **SecondArray, int FirstNum, int Secon
     for (int i = 0; i < SecondNum; i++) {
         FirstArray = (char**)realloc(FirstArray, (FirstNum + i + 1) * sizeof(char*));
         FirstArray[FirstNum + i] = SecondArray[i];
+        SecondArray[i] = NULL;
+        free(SecondArray[i]);
     }
+    free(SecondArray);
     return FirstArray;
 }
 
