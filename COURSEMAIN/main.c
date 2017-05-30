@@ -22,7 +22,6 @@ typedef struct city {
 } city;
 
 char **sumArrays(char **firstArray, char** secondArray, int firstNum, int SecondNum);
-void printStringArray(char **stringArray, int numString);
 int compareStrings(char *string1, char *string2);
 
 void freeProspList(prospect *head);
@@ -103,12 +102,7 @@ void freeCityList(city *head) {
     }
 }
 
-char *getStr () {
-    /*
-    *  Функция посимвольно считывает строку до символа ‘\n’.
-    *  Функция возвращает считанную строку newStr.
-    */
-
+char *getStr() {
     char *newStr = NULL;
     int i = -1;
     do
@@ -151,10 +145,6 @@ void printProspListReverse(prospect *head) {
 }
 
 void printCityList(city *head) {
-    /*
-    *   В функцию передается указатель на первый элемент списка head.
-	*   Функция выводит на экран содержимое информационного поля всех элементов списка.
-    */
     if (head != NULL) {
         city *link = head;
         for (int i = 1; link != NULL; i++, link = link->next) {
@@ -170,11 +160,6 @@ void printCityList(city *head) {
 }
 
 void printCityListReverse(city *head) {
-    /*
-    *   В функцию передается указатель на первый элемент списка head.
-	*   Функция выводит на экран содержимое информационного поля всех элементов списка в обратном порядке.
-    */
-
     if (head != NULL)
     {
         city *link = head;
@@ -207,15 +192,6 @@ int getIntFromBeginString(char *string) {
 }
 
 unsigned int getIntFromString(char *string, int *firstPosition) {
-
-    /*
-     * N - результирующая переменная
-     * elderPositionU - количество цифр в числе
-     * k - переменная, хранящая значение для возведения 10 в степень
-     * firstPosition = j  - текущая позиция элемента в строке (для начала строки равен "-1")
-     * string - обрабатываемая строка
-     */
-
     unsigned int N = 0;
     int *j = firstPosition, elderPositionU;
     for (elderPositionU = 0; string[++*j] != ' ' && string[*j] != '\0' && string[*j] != '.' && string[*j] != '\n'; elderPositionU++);
@@ -229,16 +205,6 @@ unsigned int getIntFromString(char *string, int *firstPosition) {
 }
 
 float getFloatFromString(char *string, int *numPosition) {
-
-    /*
-     * F - результирующее число
-     * F1 - целая часть вещественного числа
-     * F2 - мантисса
-     * numPosition - текущая позиция элемента в строке "минус" один
-     * eldPosition - позиция элемента, разделяющего мантиссу и целую часть числа
-     * string - обрабатываемая строка
-     */
-
     float F2, F;
     int F1 = 0;
     F2 = F = .0;
@@ -254,13 +220,6 @@ float getFloatFromString(char *string, int *numPosition) {
 }
 
 char *getSubstringFromString(char *string, int *numPosition) {
-
-    /*
-     * substring - результирующая строка
-     * string - исходная строка
-     * numPosition - текущая позиция элемента в строке "минус" один
-     */
-
     char* substring = NULL;
     do {
         (*numPosition)++;
@@ -272,8 +231,6 @@ char *getSubstringFromString(char *string, int *numPosition) {
 }
 
 prospect *createProspNode(char *string) {
-
-        //ограниченное кол-о проспнодов
     prospect *link = NULL;
     if (string[0] != '\0') {
         link = (prospect *) malloc(sizeof(prospect));
@@ -325,7 +282,6 @@ city *createCity(char **baseString, int numString, char **baseProspString) {
         head = link = createCityNode(baseString[0], baseProspString, &countProsp);
         link->prev = NULL;
         for (int i = 1; i < numString; i++) {
-            //вычленить кусок массива из общего исходного массива
             link->next = createCityNode(baseString[i], baseProspString, &countProsp);
             link->next->prev = link;
             link = link->next;
@@ -344,7 +300,6 @@ char **getStrArray(int *numString, int prosp) {
     for (i = 0; i < *numString; i++) {
         stringArray = (char **) realloc(stringArray, (i + 1) * sizeof(char *));
         memoryCheck(stringArray);
-        //stringArray[i] = NULL;
         stringArray[i] = getStr();
     }
     if (prosp) {
@@ -688,39 +643,40 @@ void putListToFile(city *head) {
 
     FILE *dataFileCity = NULL, *dataFileProsp = NULL;
     printf("Enter the way to the 'city' file: ");
-    dataFileCity = fopen(getStr(),"w");
+    if ((dataFileCity = fopen(getStr(),"w")) != NULL) {
 
-    printf("Enter the way to the 'prospect' file: ");
-    dataFileProsp = fopen(getStr(), "w");
+        printf("Enter the way to the 'prospect' file: ");
+        if ((dataFileProsp = fopen(getStr(), "w")) != NULL) {
 
-    city *link = head;
-    for(; link != NULL; link = link -> next) {
-        for (int i = 0; link->name[i] != '\0'; i++) {
-            fputc(link -> name[i], dataFileCity);
-        }
-        fprintf(dataFileCity, " %u %f %u", link->foundation, link->population, link->prospNumber);
-        if (link -> next != NULL) fprintf(dataFileCity, "\n");
+            city *link = head;
+            for (; link != NULL; link = link->next) {
+                for (int i = 0; link->name[i] != '\0'; i++) {
+                    fputc(link->name[i], dataFileCity);
+                }
+                fprintf(dataFileCity, " %u %f %u", link->foundation, link->population, link->prospNumber);
 
 
-        prospect *linkProsp = link -> prosp;
-        for (; linkProsp != NULL; linkProsp = linkProsp->next) {
-            for (int i = 0; linkProsp->name[i] != '\0'; i++) {
-                fputc(linkProsp -> name[i], dataFileProsp);
+                prospect *linkProsp = link->prosp;
+                for (; linkProsp != NULL; linkProsp = linkProsp->next) {
+                    for (int i = 0; linkProsp->name[i] != '\0'; i++) {
+                        fputc(linkProsp->name[i], dataFileProsp);
+                    }
+                    fprintf(dataFileProsp, " %u\n", linkProsp->number);
+
+                }
+                fprintf(dataFileProsp, "~");
+                if (link->next != NULL) {
+                    fprintf(dataFileCity, "\n");
+                    fprintf(dataFileProsp, "\n");
+                }
             }
-            fprintf(dataFileProsp, " %u\n", linkProsp->number);
-
+            fclose(dataFileProsp);
         }
-        fprintf(dataFileProsp, "~");
-        if (link -> next != NULL) fprintf(dataFileProsp, "\n");
+        fclose(dataFileCity);
     }
-
-    fclose(dataFileCity);
-    fclose(dataFileProsp);
     puts("Changes are saved");
 }
 
-//возвращает (1), если 1-ая строка должна стоять по алфавиту раньше 2-ой, иначе возвращает (2), если наоборот.
-//если строки равны, возвращает 0
 int compareStrings(char *string1, char *string2) {
     int i;
     for (i = 0; string1[i] != '\0' || string2[i] != '\0'; i++) {
@@ -739,16 +695,6 @@ char **sumArrays(char **firstArray, char **secondArray, int firstNum, int second
         firstArray[firstNum + i] = secondArray[i];
     }
     return firstArray;
-}
-
-void printStringArray(char **stringArray, int numString) {
-
-    for (int i = 0; i < numString; i++) {
-        for (int j = 0; stringArray[i][j] != '\0'; j++) {
-            printf("%c", stringArray[i][j]);
-        }
-        printf("\n");
-    }
 }
 
 city *chooseNode(city *head) {

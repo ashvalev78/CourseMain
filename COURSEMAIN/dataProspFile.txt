@@ -1,0 +1,5 @@
+mosc 1
+zvezd 2
+~
+kolpino 3
+~
